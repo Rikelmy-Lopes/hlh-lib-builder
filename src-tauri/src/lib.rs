@@ -12,33 +12,37 @@ fn resolve_resource_path(handle: tauri::AppHandle, path: String) -> PathBuf {
         .unwrap()
 }
 
-#[tauri::command]
-fn execute(handle: tauri::AppHandle, origem: String) -> String {
-    let build_xml = origem + "\\build.xml";
-    println!("{}", build_xml);
-    let name = if cfg!(windows) { "ant.bat" } else { "ant" };
-    let ant_path =
-        resolve_resource_path(handle, format!("{}{}", "./resources/apache-ant/bin/", name));
-
-    println!("Ant path: {}", ant_path.display());
-
+fn execute_build(project_path: String, ant_path: String) -> String {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
-        let output = Command::new(&ant_path.to_str().unwrap())
-            .args(["-q", "-f", &build_xml, "clean", "jar"])
+        let output = Command::new(&ant_path.to_string())
+            .args(["-q", "-f", &project_path, "clean", "jar"])
             /*             .args(["-version"]) */
             .creation_flags(0x08000000)
             .output()
             .expect("Failed to execute Ant");
 
-        let mut msg = format!("Ant path used: {}\n", ant_path.to_str().unwrap());
+        let mut msg = String::new();
         msg.push_str(&String::from_utf8_lossy(&output.stdout));
         msg.push_str(&String::from_utf8_lossy(&output.stderr));
 
         tx.send(msg).unwrap();
     });
     rx.recv().unwrap()
+}
+
+#[tauri::command]
+fn execute(handle: tauri::AppHandle, origem: String) -> String {
+    let name = if cfg!(windows) { "ant.bat" } else { "ant" };
+    let project_path = origem + "\\build.xml";
+    let ant_path =
+        resolve_resource_path(handle, format!("{}{}", "./resources/apache-ant/bin/", name));
+
+    println!("Project path: {}", project_path);
+    println!("Apache Ant path: {}", ant_path.display());
+
+    execute_build(project_path, ant_path.to_str().unwrap().to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

@@ -1,0 +1,3 @@
+
+deleta o arquivo "persistence.xml"
+./7z.exe d C:\Users\SI30\Coding\SIGP_INT\dist\SIGP_INT.jar META-INF\persistence.xml
