@@ -1,14 +1,21 @@
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { useEffect, useState } from "react";
+import { pathExists } from "./utils/fsUtils";
 
 function App() {
   const [log, setLog] = useState("");
   const [origem, setOrigem] = useState("");
-  const [destino, setDestino] = useState("");
+  const [_destino, setDestino] = useState("");
+  
 
   async function execute() {
     if (origem.length === 0) return;
+
+    if (!(await pathExists(origem))) {
+        setLog('Caminho de origem não encontrado');
+        return;
+    }
 
     const log = await invoke<string>("execute", { origem });
     setLog(log);
@@ -18,7 +25,7 @@ function App() {
     if (log.length !== 0) {
       setTimeout(() => {
         setLog("")
-      }, 60000)
+      }, 3000)
     }
   }, [log])
 
