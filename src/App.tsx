@@ -20,7 +20,7 @@ function App() {
         return;
     }
     setIsRunning(true)
-    invoke<string>("execute", { origem });
+    invoke("run_command", { origem });
 
     listen("command-complete", ({ payload }) => {
       setLog(payload as string);

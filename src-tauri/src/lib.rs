@@ -6,39 +6,44 @@ use tauri::path::BaseDirectory;
 use tauri::Manager;
 use tauri::{AppHandle, Emitter};
 
-fn resolve_resource_path(handle: &AppHandle, path: String) -> Option<PathBuf> {
+fn resolve_ant_path(handle: &AppHandle) -> Option<PathBuf> {
+    let path = format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND);
     match handle.path().resolve(path, BaseDirectory::Resource) {
         Ok(path) => Some(path),
-        Err(_e) => None,
+        Err(e) => {
+            eprintln!("Falha ao resolver caminho do recurso: {}", e);
+            None
+        }
     }
 }
 
-fn execute_build(handle: &AppHandle, project_path: String, ant_path: String) -> () {
+fn spawn_ant_build(handle: &AppHandle, project_path: String, ant_path: String) {
     let handle = handle.clone();
     thread::spawn(move || {
-        let output = Command::new(&ant_path.to_string())
+        let output = Command::new(&ant_path)
             .args(["-q", "-f", &project_path, "clean", "jar"])
             /* .args(["-version"]) */
             .env_remove("ANT_HOME")
             .output()
-            .expect("Failed to execute Ant");
+            .expect("Falha ao executar o Apache Ant. Verifique se o caminho está correto.");
 
-        let mut msg = String::new();
-        msg.push_str(&String::from_utf8_lossy(&output.stdout));
-        msg.push_str(&String::from_utf8_lossy(&output.stderr));
+        let msg = format!(
+            "{}{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
         handle.emit("command-complete", msg)
     });
 }
 
 #[tauri::command]
-fn execute(handle: AppHandle, origem: String) -> () {
+fn run_command(handle: AppHandle, origem: String) {
     let project_path = format!("{}\\{}", origem, BUILD_EXTENSION);
 
-    match resolve_resource_path(&handle, format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND)) {
-        Some(path) => execute_build(&handle, project_path, path.display().to_string()),
+    match resolve_ant_path(&handle) {
+        Some(path) => spawn_ant_build(&handle, project_path, path.display().to_string()),
         None => {
-            println!("Falha ao encontrar o binario do ant!");
-            "Falha ao encontrar o binario do ant!".to_string();
+            eprintln!("Falha ao encontrar o binario do Ant!");
         }
     }
 }
@@ -48,7 +53,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![execute])
+        .invoke_handler(tauri::generate_handler![run_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
