@@ -78,7 +78,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+input:hover, button:hover {
   border-color: #396cd8;
 }
 button:active {
@@ -114,3 +114,12 @@ button {
     background-color: #0f0f0f69;
   }
 }
+
+
+input:disabled, button:disabled {
+  color: #aaaaaa;
+  background-color: #18181888;
+  cursor: not-allowed;  
+  border-color: transparent;
+}
+
