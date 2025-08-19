@@ -1,15 +1,16 @@
-use std::os::windows::process::CommandExt;
+mod config;
+use crate::config::global::{ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION};
 use std::sync::mpsc;
 use std::thread;
 use std::{path::PathBuf, process::Command};
 use tauri::path::BaseDirectory;
 use tauri::Manager;
 
-fn resolve_resource_path(handle: tauri::AppHandle, path: String) -> PathBuf {
-    handle
-        .path()
-        .resolve(path, BaseDirectory::Resource)
-        .unwrap()
+fn resolve_resource_path(handle: tauri::AppHandle, path: String) -> Option<PathBuf> {
+    match handle.path().resolve(path, BaseDirectory::Resource) {
+        Ok(path) => Some(path),
+        Err(_e) => None,
+    }
 }
 
 fn execute_build(project_path: String, ant_path: String) -> String {
@@ -17,8 +18,8 @@ fn execute_build(project_path: String, ant_path: String) -> String {
 
     thread::spawn(move || {
         let output = Command::new(&ant_path.to_string())
-            .args(["-q", "-f", &project_path, "clean", "jar"])
-            /* .args(["-version"]) */
+            /* .args(["-q", "-f", &project_path, "clean", "jar"]) */
+            .args(["-version"])
             .env_remove("ANT_HOME")
             .output()
             .expect("Failed to execute Ant");
@@ -34,15 +35,19 @@ fn execute_build(project_path: String, ant_path: String) -> String {
 
 #[tauri::command]
 fn execute(handle: tauri::AppHandle, origem: String) -> String {
-    let name = if cfg!(windows) { "ant.bat" } else { "ant" };
-    let project_path = origem + "\\build.xml";
-    let ant_path =
-        resolve_resource_path(handle, format!("{}{}", "./resources/apache-ant/bin/", name));
+    let project_path = format!("{}\\{}", origem, BUILD_EXTENSION);
 
-    println!("Project path: {}", project_path);
-    println!("Apache Ant path: {}", ant_path.display());
-
-    execute_build(project_path, ant_path.to_str().unwrap().to_string())
+    match resolve_resource_path(handle, format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND)) {
+        Some(path) => {
+            println!("Project path: {}", project_path);
+            println!("Apache Ant path: {}", path.display());
+            execute_build(project_path, path.to_str().unwrap().to_string())
+        }
+        None => {
+            println!("Falha ao encontrar o binario do ant!");
+            "Falha ao encontrar o binario do ant!".to_string()
+        }
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
