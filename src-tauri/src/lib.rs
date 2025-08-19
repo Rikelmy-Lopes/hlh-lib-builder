@@ -18,8 +18,8 @@ fn execute_build(project_path: String, ant_path: String) -> String {
     thread::spawn(move || {
         let output = Command::new(&ant_path.to_string())
             .args(["-q", "-f", &project_path, "clean", "jar"])
-            /*             .args(["-version"]) */
-            .creation_flags(0x08000000)
+            /* .args(["-version"]) */
+            .env_remove("ANT_HOME")
             .output()
             .expect("Failed to execute Ant");
 
