@@ -11,12 +11,12 @@ function App() {
   const [origem, setOrigem] = useState("");
   const [_destino, setDestino] = useState("");
 
-  function testeOnly() {
+  /*   function testeOnly() {
     setIsRunning(true);
     setTimeout(() => {
       setIsRunning(false);
     }, 5000);
-  }
+  } */
 
   async function execute() {
     /* testeOnly(); */
