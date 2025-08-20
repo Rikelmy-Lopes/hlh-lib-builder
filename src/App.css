@@ -28,6 +28,7 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  gap: 5px;
 }
 
 .logo {
@@ -123,3 +124,10 @@ input:disabled, button:disabled {
   border-color: transparent;
 }
 
+.container-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
