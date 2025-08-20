@@ -1,7 +1,7 @@
-pub static ANT_RESOURCE_PATH: &str = "./resources/apache-ant/bin/";
+pub const ANT_RESOURCE_PATH: &str = "./resources/apache-ant/bin/";
 
-pub static ANT_COMMAND: &str = if cfg!(windows) { "ant.bat" } else { "ant" };
+pub const ANT_COMMAND: &str = if cfg!(windows) { "ant.bat" } else { "ant" };
 
-pub static BUILD_EXTENSION: &str = "build.xml";
+pub const BUILD_EXTENSION: &str = "build.xml";
 
-pub static CREATE_NO_WINDOW_FLAG: u32 = 0x08000000;
+pub const CREATE_NO_WINDOW_FLAG: u32 = 0x08000000;
