@@ -1,55 +1,57 @@
 mod config;
-use crate::config::global::{
-    ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION, CREATE_NO_WINDOW_FLAG,
+mod utils;
+use crate::{
+    config::global::{ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION, SEVEN_ZIP_RESOURCE_PATH},
+    utils::{
+        commands::{spawn_7zip, spawn_ant_build},
+        path::resolve_resource_path,
+    },
 };
-use std::os::windows::process::CommandExt;
+use std::process::Output;
 use std::thread;
-use std::{path::PathBuf, process::Command};
-use tauri::path::BaseDirectory;
-use tauri::Manager;
 use tauri::{AppHandle, Emitter};
 
-fn resolve_ant_path(handle: &AppHandle) -> Option<PathBuf> {
-    let path = format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND);
-    match handle.path().resolve(path, BaseDirectory::Resource) {
-        Ok(path) => Some(path),
-        Err(e) => {
-            eprintln!("Falha ao resolver caminho do recurso: {}", e);
-            None
-        }
-    }
+fn format_output(output: Output) -> String {
+    format!(
+        "{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    )
 }
 
-fn spawn_ant_build(handle: &AppHandle, project_path: String, ant_path: String) {
-    let handle = handle.clone();
-    thread::spawn(move || {
-        let output = Command::new(&ant_path)
-            .args(["-q", "-f", &project_path, "clean", "jar"])
-            /* .args(["-version"]) */
-            .creation_flags(CREATE_NO_WINDOW_FLAG)
-            .env_remove("ANT_HOME")
-            .output()
-            .expect("Falha ao executar o Apache Ant. Verifique se o caminho está correto.");
+fn spawn_commands(handle: AppHandle, origem: String) {
+    let project_path = format!("{}\\{}", origem, BUILD_EXTENSION);
+    let ant_path = format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND);
+    let seven_zip_path = format!("{}", SEVEN_ZIP_RESOURCE_PATH);
 
-        let msg = format!(
-            "{}{}",
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
-        handle.emit("command-complete", msg)
+    thread::spawn(move || {
+        match resolve_resource_path(&handle, &ant_path) {
+            Some(path) => {
+                let output = spawn_ant_build(&project_path, &path);
+
+                let _ = handle.emit("ant-complete", format_output(output));
+            }
+            None => {
+                eprintln!("Falha ao encontrar o binario do Ant!");
+            }
+        }
+
+        match resolve_resource_path(&handle, &seven_zip_path) {
+            Some(path) => {
+                let output = spawn_7zip(&path, &origem);
+
+                let _ = handle.emit("7zip-complete", format_output(output));
+            }
+            None => {
+                eprintln!("Falha ao encontrar o binario do 7zip!");
+            }
+        }
     });
 }
 
 #[tauri::command]
 fn run_command(handle: AppHandle, origem: String) {
-    let project_path = format!("{}\\{}", origem, BUILD_EXTENSION);
-
-    match resolve_ant_path(&handle) {
-        Some(path) => spawn_ant_build(&handle, project_path, path.display().to_string()),
-        None => {
-            eprintln!("Falha ao encontrar o binario do Ant!");
-        }
-    }
+    spawn_commands(handle, origem);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

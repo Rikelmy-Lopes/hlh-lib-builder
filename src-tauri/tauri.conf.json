@@ -23,7 +23,7 @@
   },
   "bundle": {
     "resources": [
-      "./resources/apache-ant/**/*"
+      "./resources/**/*"
     ],
     "active": true,
     "targets": "all",

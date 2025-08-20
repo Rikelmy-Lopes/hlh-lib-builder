@@ -8,7 +8,7 @@ import { listen } from "@tauri-apps/api/event";
 function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [log, setLog] = useState("");
-  const [origem, setOrigem] = useState("");
+  const [origem, setOrigem] = useState("C:\\Users\\SI30\\Documents");
   const [_destino, setDestino] = useState("");
 
   /*   function testeOnly() {
@@ -30,7 +30,10 @@ function App() {
     setIsRunning(true);
     invoke("run_command", { origem });
 
-    listen("command-complete", ({ payload }) => {
+    listen("ant-complete", ({ payload }) => {
+      setLog(payload as string);
+    });
+    listen("7zip-complete", ({ payload }) => {
       setLog(payload as string);
       setIsRunning(false);
     });
@@ -50,6 +53,7 @@ function App() {
         type="text"
         name=""
         id=""
+        value={origem}
         placeholder="Origem"
         onChange={({ target }) => setOrigem(target.value)}
         disabled={isRunning}
