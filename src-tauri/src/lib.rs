@@ -1,5 +1,8 @@
 mod config;
-use crate::config::global::{ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION};
+use crate::config::global::{
+    ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION, CREATE_NO_WINDOW_FLAG,
+};
+use std::os::windows::process::CommandExt;
 use std::thread;
 use std::{path::PathBuf, process::Command};
 use tauri::path::BaseDirectory;
@@ -23,6 +26,7 @@ fn spawn_ant_build(handle: &AppHandle, project_path: String, ant_path: String) {
         let output = Command::new(&ant_path)
             .args(["-q", "-f", &project_path, "clean", "jar"])
             /* .args(["-version"]) */
+            .creation_flags(CREATE_NO_WINDOW_FLAG)
             .env_remove("ANT_HOME")
             .output()
             .expect("Falha ao executar o Apache Ant. Verifique se o caminho está correto.");
