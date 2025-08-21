@@ -9,7 +9,7 @@ function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [log, setLog] = useState("");
   const [origem, setOrigem] = useState("C:\\Users\\SI30\\Documents");
-  const [_destino, setDestino] = useState("");
+  const [destino, setDestino] = useState("");
 
   /*   function testeOnly() {
     setIsRunning(true);
@@ -19,25 +19,33 @@ function App() {
   } */
 
   async function execute() {
-    /* testeOnly(); */
-    if (origem.length === 0) return;
     if (isRunning) return;
+    /* testeOnly(); */
+    if (origem.length === 0 || destino.length === 0) return;
 
-    if (!(await pathExists(origem))) {
-      setLog("Caminho de origem não encontrado");
+    if (!(await pathExists(origem + "\\build.xml"))) {
+      setLog(
+        "Arquivo build.xml não encontrado na origem! Verifique o caminho do projeto!"
+      );
+      return;
+    }
+    if (!(await pathExists(destino + "\\src\\main\\webapp\\WEB-INF\\lib"))) {
+      setLog(
+        "Caminho de destino não encontrado! Verifique o caminho do projeto!"
+      );
       return;
     }
     setIsRunning(true);
-    invoke("run_command", { origem });
     setListeners(setIsRunning, setLog);
+    invoke("run_command", { origem });
   }
 
   useEffect(() => {
-    if (log.length !== 0) {
-      setTimeout(() => {
-        setLog("");
-      }, 3000);
-    }
+    if (log.length === 0) return;
+
+    setTimeout(() => {
+      setLog("");
+    }, 3000);
   }, [log]);
 
   return (
@@ -48,15 +56,16 @@ function App() {
         id=""
         value={origem}
         placeholder="Origem"
-        onChange={({ target }) => setOrigem(target.value)}
+        onChange={({ target }) => setOrigem(target.value.trim())}
         disabled={isRunning}
       />
       <input
         type="text"
         name=""
         id=""
+        value={destino}
         placeholder="Destino"
-        onChange={({ target }) => setDestino(target.value)}
+        onChange={({ target }) => setDestino(target.value.trim())}
         disabled={isRunning}
       />
       <div className="container-button">
