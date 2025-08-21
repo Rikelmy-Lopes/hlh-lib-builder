@@ -18,6 +18,7 @@ pub fn spawn_7zip(seven_zip_path: &str, origem: &str) -> Output {
     let path = format!("{}\\{}", origem, "\\dist\\SIGP_INT.jar");
     Command::new(seven_zip_path)
         .args(["d", &path, "META-INF\\persistence.xml"])
+        .creation_flags(CREATE_NO_WINDOW_FLAG)
         /* .args(["-version"]) */
         .output()
         .expect("Falha ao executar o 7zip.")
