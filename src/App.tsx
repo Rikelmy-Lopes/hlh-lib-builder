@@ -2,9 +2,10 @@ import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import "./css/loading-animation.css";
 import { useEffect, useState } from "react";
-import { pathExists } from "./utils/fsUtils";
+import { copyBuildFileToDestination, pathExists } from "./utils/fsUtils";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
+import { listen } from "@tauri-apps/api/event";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -40,6 +41,10 @@ function App() {
     setIsRunning(true);
     setListeners(setIsRunning, setLog);
     invoke("run_command", { origem });
+    listen("7zip-complete-successful", async () => {
+      await copyBuildFileToDestination(origem, destino);
+      setIsRunning(false);
+    });
   }
 
   useEffect(() => {

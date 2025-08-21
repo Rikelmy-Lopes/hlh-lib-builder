@@ -28,6 +28,12 @@
       "allow": [
         "$APPLOG/*/**"
       ]
+    },
+    {
+      "identifier": "fs:allow-copy-file",
+      "allow": [
+        "$HOME/*/**"
+      ]
     }
   ]
 }

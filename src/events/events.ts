@@ -27,7 +27,6 @@ export function setListeners(
     console.log(_7ZIP_COMPLETE_SUCCESSFUL);
     writeLog(_7ZIP_COMPLETE_SUCCESSFUL + " ->> " + payload);
     setLog(payload as string);
-    setIsRunning(false);
   });
 
   listen(_7ZIP_COMPLETE_WITH_ERROR, ({ payload }) => {
