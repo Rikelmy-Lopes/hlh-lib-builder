@@ -4,11 +4,12 @@ import "./css/loading-animation.css";
 import { useEffect, useState } from "react";
 import { pathExists } from "./utils/fsUtils";
 import { setListeners } from "./events/events";
+import { loadConfig, saveConfig } from "./utils/config";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [log, setLog] = useState("");
-  const [origem, setOrigem] = useState("C:\\Users\\SI30\\Documents");
+  const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
 
   /*   function testeOnly() {
@@ -35,6 +36,7 @@ function App() {
       );
       return;
     }
+    saveConfig(origem, destino);
     setIsRunning(true);
     setListeners(setIsRunning, setLog);
     invoke("run_command", { origem });
@@ -47,6 +49,15 @@ function App() {
       setLog("");
     }, 3000);
   }, [log]);
+
+  useEffect(() => {
+    (async () => {
+      const { origem, destino } = await loadConfig();
+
+      setOrigem(origem);
+      setDestino(destino);
+    })();
+  }, []);
 
   return (
     <main className="container">

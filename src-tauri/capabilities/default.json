@@ -12,20 +12,21 @@
       "identifier": "fs:allow-exists",
       "allow": [
         {
-          "path": "*/**"
+          "path": "$HOME/*/**"
         }
       ]
     },
     {
       "identifier": "fs:allow-app-write",
       "allow": [
-        "$APPLOG/*"
+        "$APPLOG/*/**",
+        "$APPLOCALDATA/*/**"
       ]
     },
     {
       "identifier": "fs:allow-mkdir",
       "allow": [
-        "$APPLOG/*"
+        "$APPLOG/*/**"
       ]
     }
   ]
