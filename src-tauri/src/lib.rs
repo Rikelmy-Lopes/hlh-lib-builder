@@ -43,6 +43,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do Ant!");
+                let _ = handle.emit("log", "Falha ao encontrar o binario do Ant!");
             }
         }
 
@@ -55,6 +56,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do 7zip!");
+                let _ = handle.emit("log", "Falha ao encontrar o binario do 7zip!");
             }
         }
     });

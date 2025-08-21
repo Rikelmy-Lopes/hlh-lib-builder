@@ -1,4 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
+import { writeLog } from "../utils/fsUtils";
 
 const ANT_COMPLETE_SUCCESSFUL = "ant-complete-successful";
 const ANT_COMPLETE_WITH_ERROR = "ant-complete-with-error";
@@ -11,24 +12,32 @@ export function setListeners(
 ) {
   listen(ANT_COMPLETE_SUCCESSFUL, ({ payload }) => {
     console.log(ANT_COMPLETE_SUCCESSFUL);
+    writeLog(ANT_COMPLETE_SUCCESSFUL + " ->> " + payload);
     setLog(payload as string);
   });
 
   listen(ANT_COMPLETE_WITH_ERROR, ({ payload }) => {
     console.log(ANT_COMPLETE_WITH_ERROR);
+    writeLog(ANT_COMPLETE_WITH_ERROR + " ->> " + payload);
     setIsRunning(false);
     setLog(payload as string);
   });
 
   listen(_7ZIP_COMPLETE_SUCCESSFUL, ({ payload }) => {
     console.log(_7ZIP_COMPLETE_SUCCESSFUL);
+    writeLog(_7ZIP_COMPLETE_SUCCESSFUL + " ->> " + payload);
     setLog(payload as string);
     setIsRunning(false);
   });
 
   listen(_7ZIP_COMPLETE_WITH_ERROR, ({ payload }) => {
     console.log(_7ZIP_COMPLETE_WITH_ERROR);
+    writeLog(_7ZIP_COMPLETE_WITH_ERROR + " ->> " + payload);
     setLog(payload as string);
     setIsRunning(false);
+  });
+
+  listen("log", ({ payload }) => {
+    writeLog("[ERROR]" + " ->> " + payload);
   });
 }
