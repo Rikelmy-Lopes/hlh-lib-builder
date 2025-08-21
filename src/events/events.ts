@@ -1,5 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
-import { writeLog } from "../utils/fsUtils";
+import { writeLog } from "../utils/log";
 
 const ANT_COMPLETE_SUCCESSFUL = "ant-complete-successful";
 const ANT_COMPLETE_WITH_ERROR = "ant-complete-with-error";
