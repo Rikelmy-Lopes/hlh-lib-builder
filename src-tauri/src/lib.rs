@@ -11,12 +11,16 @@ use std::process::Output;
 use std::thread;
 use tauri::{AppHandle, Emitter};
 
-fn format_output(output: Output) -> String {
+fn format_output(output: &Output) -> String {
     format!(
         "{}{}",
         String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr)
     )
+}
+
+fn is_build_successful(output: &str) -> bool {
+    output.contains("BUILD SUCCESSFUL")
 }
 
 fn spawn_commands(handle: AppHandle, origem: String) {
@@ -28,8 +32,14 @@ fn spawn_commands(handle: AppHandle, origem: String) {
         match resolve_resource_path(&handle, &ant_path) {
             Some(path) => {
                 let output = spawn_ant_build(&project_path, &path);
+                let formatted_output = format_output(&output);
 
-                let _ = handle.emit("ant-complete", format_output(output));
+                if !is_build_successful(&formatted_output) {
+                    let _ = handle.emit("ant-complete-with-error", formatted_output);
+                    return;
+                }
+
+                let _ = handle.emit("ant-complete-successful", formatted_output);
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do Ant!");
@@ -39,8 +49,9 @@ fn spawn_commands(handle: AppHandle, origem: String) {
         match resolve_resource_path(&handle, &seven_zip_path) {
             Some(path) => {
                 let output = spawn_7zip(&path, &origem);
+                let formatted_output = format_output(&output);
 
-                let _ = handle.emit("7zip-complete", format_output(output));
+                let _ = handle.emit("7zip-complete-successful", formatted_output);
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do 7zip!");

@@ -3,7 +3,7 @@ import "./App.css";
 import "./css/loading-animation.css";
 import { useEffect, useState } from "react";
 import { pathExists } from "./utils/fsUtils";
-import { listen } from "@tauri-apps/api/event";
+import { setListeners } from "./events/events";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -29,14 +29,7 @@ function App() {
     }
     setIsRunning(true);
     invoke("run_command", { origem });
-
-    listen("ant-complete", ({ payload }) => {
-      setLog(payload as string);
-    });
-    listen("7zip-complete", ({ payload }) => {
-      setLog(payload as string);
-      setIsRunning(false);
-    });
+    setListeners(setIsRunning, setLog);
   }
 
   useEffect(() => {
