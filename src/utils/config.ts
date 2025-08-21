@@ -18,10 +18,7 @@ export async function saveConfig(origem: string, destino: string) {
   });
 }
 
-export async function loadConfig(): Promise<{
-  origem: string;
-  destino: string;
-}> {
+export async function loadConfig(): Promise<{ origem: string; destino: string }> {
   try {
     const data = await readTextFile("config/settings.json", {
       baseDir: BaseDirectory.AppLocalData,

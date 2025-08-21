@@ -63,7 +63,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
 }
 
 #[tauri::command]
-fn run_command(handle: AppHandle, origem: String) {
+fn start(handle: AppHandle, origem: String) {
     spawn_commands(handle, origem);
 }
 
@@ -71,7 +71,7 @@ fn run_command(handle: AppHandle, origem: String) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![run_command])
+        .invoke_handler(tauri::generate_handler![start])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

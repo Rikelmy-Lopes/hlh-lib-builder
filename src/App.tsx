@@ -1,11 +1,12 @@
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import "./css/loading-animation.css";
+import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { copyBuildFileToDestination, pathExists } from "./utils/fsUtils";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
 import { listen } from "@tauri-apps/api/event";
+import { _7ZIP_EVENT_COMPLETE_SUCCESSFUL, DESTINATION_LIB_PATH } from "./constants/constants";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -13,35 +14,23 @@ function App() {
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
 
-  /*   function testeOnly() {
-    setIsRunning(true);
-    setTimeout(() => {
-      setIsRunning(false);
-    }, 5000);
-  } */
-
-  async function execute() {
+  async function start() {
     if (isRunning) return;
-    /* testeOnly(); */
     if (origem.length === 0 || destino.length === 0) return;
 
     if (!(await pathExists(origem + "\\build.xml"))) {
-      setLog(
-        "Arquivo build.xml não encontrado na origem! Verifique o caminho do projeto!"
-      );
+      setLog("Arquivo build.xml não encontrado na origem! Verifique o caminho do projeto!");
       return;
     }
-    if (!(await pathExists(destino + "\\src\\main\\webapp\\WEB-INF\\lib"))) {
-      setLog(
-        "Caminho de destino não encontrado! Verifique o caminho do projeto!"
-      );
+    if (!(await pathExists(destino + DESTINATION_LIB_PATH))) {
+      setLog("Caminho de destino não encontrado! Verifique o caminho do projeto!");
       return;
     }
     saveConfig(origem, destino);
     setIsRunning(true);
     setListeners(setIsRunning, setLog);
-    invoke("run_command", { origem });
-    listen("7zip-complete-successful", async () => {
+    invoke("start", { origem });
+    listen(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async () => {
       await copyBuildFileToDestination(origem, destino);
       setIsRunning(false);
     });
@@ -85,7 +74,7 @@ function App() {
         disabled={isRunning}
       />
       <div className="container-button">
-        <button disabled={isRunning} onClick={execute}>
+        <button disabled={isRunning} onClick={start}>
           Executar
         </button>
         <div>

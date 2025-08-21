@@ -1,42 +1,44 @@
 import { listen } from "@tauri-apps/api/event";
 import { writeLog } from "../utils/log";
-
-const ANT_COMPLETE_SUCCESSFUL = "ant-complete-successful";
-const ANT_COMPLETE_WITH_ERROR = "ant-complete-with-error";
-const _7ZIP_COMPLETE_SUCCESSFUL = "7zip-complete-successful";
-const _7ZIP_COMPLETE_WITH_ERROR = "7zip-complete-with-error";
+import {
+  _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+  _7ZIP_EVENT_COMPLETE_WITH_ERROR,
+  ANT_EVENT_COMPLETE_SUCCESSFUL,
+  ANT_EVENT_COMPLETE_WITH_ERROR,
+} from "../constants/constants";
 
 export function setListeners(
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
   setLog: React.Dispatch<React.SetStateAction<string>>
 ) {
-  listen(ANT_COMPLETE_SUCCESSFUL, ({ payload }) => {
-    console.log(ANT_COMPLETE_SUCCESSFUL);
-    writeLog(ANT_COMPLETE_SUCCESSFUL + " ->> " + payload);
-    setLog(payload as string);
+  listen<string>(ANT_EVENT_COMPLETE_SUCCESSFUL, ({ payload }) => {
+    console.log(ANT_EVENT_COMPLETE_SUCCESSFUL);
+    writeLog(ANT_EVENT_COMPLETE_SUCCESSFUL + " ->> " + payload);
+    setLog(payload);
   });
 
-  listen(ANT_COMPLETE_WITH_ERROR, ({ payload }) => {
-    console.log(ANT_COMPLETE_WITH_ERROR);
-    writeLog(ANT_COMPLETE_WITH_ERROR + " ->> " + payload);
+  listen<string>(ANT_EVENT_COMPLETE_WITH_ERROR, ({ payload }) => {
+    console.log(ANT_EVENT_COMPLETE_WITH_ERROR);
+    writeLog(ANT_EVENT_COMPLETE_WITH_ERROR + " ->> " + payload);
     setIsRunning(false);
-    setLog(payload as string);
+    setLog(payload);
   });
 
-  listen(_7ZIP_COMPLETE_SUCCESSFUL, ({ payload }) => {
-    console.log(_7ZIP_COMPLETE_SUCCESSFUL);
-    writeLog(_7ZIP_COMPLETE_SUCCESSFUL + " ->> " + payload);
-    setLog(payload as string);
+  listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, ({ payload }) => {
+    12;
+    console.log(_7ZIP_EVENT_COMPLETE_SUCCESSFUL);
+    writeLog(_7ZIP_EVENT_COMPLETE_SUCCESSFUL + " ->> " + payload);
+    setLog(payload);
   });
 
-  listen(_7ZIP_COMPLETE_WITH_ERROR, ({ payload }) => {
-    console.log(_7ZIP_COMPLETE_WITH_ERROR);
-    writeLog(_7ZIP_COMPLETE_WITH_ERROR + " ->> " + payload);
-    setLog(payload as string);
+  listen<string>(_7ZIP_EVENT_COMPLETE_WITH_ERROR, ({ payload }) => {
+    console.log(_7ZIP_EVENT_COMPLETE_WITH_ERROR);
+    writeLog(_7ZIP_EVENT_COMPLETE_WITH_ERROR + " ->> " + payload);
+    setLog(payload);
     setIsRunning(false);
   });
 
-  listen("log", ({ payload }) => {
+  listen<string>("log", ({ payload }) => {
     writeLog("[ERROR]" + " ->> " + payload);
   });
 }
