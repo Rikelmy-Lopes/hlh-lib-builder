@@ -7,19 +7,26 @@
   ],
   "permissions": [
     "core:default",
-    "opener:default",
     "fs:default",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "*/**"}]
+      "allow": [
+        {
+          "path": "*/**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-app-write",
-      "allow": ["$APPLOG/*"]
+      "allow": [
+        "$APPLOG/*"
+      ]
     },
-        {
+    {
       "identifier": "fs:allow-mkdir",
-      "allow": ["$APPLOG/*"]
+      "allow": [
+        "$APPLOG/*"
+      ]
     }
   ]
 }
