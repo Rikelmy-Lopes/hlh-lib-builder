@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "hlh-lib-builder2",
+  "productName": "hlh-lib-builder",
   "version": "0.1.0",
   "identifier": "com.hlh.lib.builder",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "hlh-lib-builder2",
+        "title": "hlh-lib-builder",
         "width": 800,
         "height": 600
       }
