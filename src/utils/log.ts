@@ -14,3 +14,8 @@ export async function writeLog(log: string) {
     baseDir: BaseDirectory.AppLog,
   });
 }
+
+export function logEvent(event: string, payload: string) {
+  console.log(event);
+  writeLog(`${event} ->> ${payload}`);
+}
