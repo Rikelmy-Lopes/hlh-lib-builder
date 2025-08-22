@@ -131,3 +131,14 @@ input:disabled, button:disabled {
   flex-direction: column;
   gap: 20px;
 }
+
+.container-input {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+}
+
+.container-input > input {
+  flex: 1 1 90%;
+}

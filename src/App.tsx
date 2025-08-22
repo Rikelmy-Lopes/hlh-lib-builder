@@ -13,7 +13,7 @@ import {
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import { shouldStart } from "./dialog/prompt";
+import { chooseFolder, shouldStart } from "./dialog/prompt";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -70,24 +70,30 @@ function App() {
 
   return (
     <main className="container">
-      <input
-        type="text"
-        name=""
-        id=""
-        value={origem}
-        placeholder="Origem"
-        onChange={({ target }) => setOrigem(target.value.trim())}
-        disabled={isRunning}
-      />
-      <input
-        type="text"
-        name=""
-        id=""
-        value={destino}
-        placeholder="Destino"
-        onChange={({ target }) => setDestino(target.value.trim())}
-        disabled={isRunning}
-      />
+      <div className="container-input">
+        <input
+          type="text"
+          name=""
+          id=""
+          value={origem}
+          placeholder="Origem"
+          onChange={({ target }) => setOrigem(target.value.trim())}
+          disabled={isRunning}
+        />
+        <button onClick={() => chooseFolder(setOrigem)}>Escolher</button>
+      </div>
+      <div className="container-input">
+        <input
+          type="text"
+          name=""
+          id=""
+          value={destino}
+          placeholder="Destino"
+          onChange={({ target }) => setDestino(target.value.trim())}
+          disabled={isRunning}
+        />
+        <button onClick={() => chooseFolder(setDestino)}>Escolher</button>
+      </div>
       <div className="container-button">
         <button disabled={isRunning} onClick={start}>
           Executar
