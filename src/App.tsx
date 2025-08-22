@@ -54,7 +54,7 @@ function App() {
       return;
     }
     setIsRunning(true);
-    setListeners(setIsRunning, setLog);
+    setListeners(setIsRunning);
     invoke("start", { origem });
     listen(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async () => {
       const success = await copyBuildFileToDestination(origem, destino);
