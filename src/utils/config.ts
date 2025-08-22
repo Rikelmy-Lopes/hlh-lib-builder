@@ -1,8 +1,7 @@
 import { BaseDirectory } from "@tauri-apps/api/path";
 import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { writeLog } from "./log";
-
-const CONFIG_FILE = "config/settings.json";
+import { CONFIG_FILE } from "../constants/constants";
 
 export async function saveConfig(origem: string, destino: string) {
   const settings = {
