@@ -6,9 +6,11 @@ import {
   ANT_EVENT_COMPLETE_SUCCESSFUL,
   ANT_EVENT_COMPLETE_WITH_ERROR,
 } from "../constants/constants";
-import { displayErrorDialog } from "../dialog/prompt";
+import { displayErrorDialog, displaySuccessfulDialog } from "../dialog/prompt";
+import { copyBuildFileToDestination } from "../utils/fsUtils";
+let isListenersRegistered = false;
 
-export function setListeners(setIsRunning: React.Dispatch<React.SetStateAction<boolean>>) {
+function setAntListeners(setIsRunning: React.Dispatch<React.SetStateAction<boolean>>) {
   listen<string>(ANT_EVENT_COMPLETE_SUCCESSFUL, ({ payload }) => {
     console.log(ANT_EVENT_COMPLETE_SUCCESSFUL);
     writeLog(ANT_EVENT_COMPLETE_SUCCESSFUL + " ->> " + payload);
@@ -20,10 +22,19 @@ export function setListeners(setIsRunning: React.Dispatch<React.SetStateAction<b
     setIsRunning(false);
     displayErrorDialog(payload);
   });
+}
 
-  listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, ({ payload }) => {
+function set7zipListeners(
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
+  origem: string,
+  destino: string
+) {
+  listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async ({ payload }) => {
     console.log(_7ZIP_EVENT_COMPLETE_SUCCESSFUL);
     writeLog(_7ZIP_EVENT_COMPLETE_SUCCESSFUL + " ->> " + payload);
+    const success = await copyBuildFileToDestination(origem, destino);
+    success ? displaySuccessfulDialog() : displayErrorDialog("");
+    setIsRunning(false);
   });
 
   listen<string>(_7ZIP_EVENT_COMPLETE_WITH_ERROR, ({ payload }) => {
@@ -32,8 +43,21 @@ export function setListeners(setIsRunning: React.Dispatch<React.SetStateAction<b
     setIsRunning(false);
     displayErrorDialog(payload);
   });
+}
+
+export function setListeners(
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
+  origem: string,
+  destino: string
+) {
+  if (isListenersRegistered) return;
+
+  setAntListeners(setIsRunning);
+  set7zipListeners(setIsRunning, origem, destino);
 
   listen<string>("log", ({ payload }) => {
     writeLog("[ERROR]" + " ->> " + payload);
   });
+
+  isListenersRegistered = true;
 }

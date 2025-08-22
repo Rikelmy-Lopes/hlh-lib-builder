@@ -2,10 +2,8 @@ import "./App.css";
 import "./css/loading-animation.css";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
-import { copyBuildFileToDestination } from "./utils/fsUtils";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
-import { listen } from "@tauri-apps/api/event";
 import {
   _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
   DESTINATION_LIB_PATH,
@@ -13,12 +11,7 @@ import {
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import {
-  chooseFolder,
-  displayErrorDialog,
-  displaySuccessfulDialog,
-  shouldStart,
-} from "./dialog/prompt";
+import { chooseFolder, shouldStart } from "./dialog/prompt";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -54,17 +47,8 @@ function App() {
       return;
     }
     setIsRunning(true);
-    setListeners(setIsRunning);
+    setListeners(setIsRunning, origem, destino);
     invoke("start", { origem });
-    listen(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async () => {
-      const success = await copyBuildFileToDestination(origem, destino);
-      if (success) {
-        displaySuccessfulDialog();
-      } else {
-        displayErrorDialog("");
-      }
-      setIsRunning(false);
-    });
   }
 
   useEffect(() => {
