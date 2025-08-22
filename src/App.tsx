@@ -13,7 +13,12 @@ import {
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import { chooseFolder, shouldStart } from "./dialog/prompt";
+import {
+  chooseFolder,
+  displayErrorDialog,
+  displaySuccessfulDialog,
+  shouldStart,
+} from "./dialog/prompt";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -52,7 +57,12 @@ function App() {
     setListeners(setIsRunning, setLog);
     invoke("start", { origem });
     listen(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async () => {
-      await copyBuildFileToDestination(origem, destino);
+      const success = await copyBuildFileToDestination(origem, destino);
+      if (success) {
+        displaySuccessfulDialog();
+      } else {
+        displayErrorDialog("");
+      }
       setIsRunning(false);
     });
   }

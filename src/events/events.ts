@@ -25,7 +25,6 @@ export function setListeners(
   });
 
   listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, ({ payload }) => {
-    12;
     console.log(_7ZIP_EVENT_COMPLETE_SUCCESSFUL);
     writeLog(_7ZIP_EVENT_COMPLETE_SUCCESSFUL + " ->> " + payload);
     setLog(payload);

@@ -9,8 +9,10 @@ export async function copyBuildFileToDestination(origem: string, destino: string
   const fullDestinoPath = await join(destino, DESTINATION_LIB_PATH, jarFileName);
   try {
     await copyFile(fullOrigemPath, fullDestinoPath);
+    return true;
   } catch (e) {
     console.error("Failed copying jar file: ", e);
     writeLog("[ERROR]" + " ->> " + (e as Error).message);
+    return false;
   }
 }
