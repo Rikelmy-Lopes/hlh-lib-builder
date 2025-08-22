@@ -4,6 +4,7 @@ use crate::{
     config::constants::{
         ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
         ANT_RESOURCE_PATH, SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+        _7ZIP_EVENT_COMPLETE_WITH_ERROR,
     },
     utils::{
         commands::{spawn_7zip, spawn_ant_build},
@@ -24,6 +25,10 @@ fn format_output(output: &Output) -> String {
 
 fn is_build_successful(output: &str) -> bool {
     output.contains("BUILD SUCCESSFUL")
+}
+
+fn is_7zip_successful(output: &str) -> bool {
+    output.contains("Delete data from archive: 1 file")
 }
 
 fn spawn_commands(handle: AppHandle, origem: String) {
@@ -53,6 +58,11 @@ fn spawn_commands(handle: AppHandle, origem: String) {
             Some(path) => {
                 let output = spawn_7zip(&path, &origem);
                 let formatted_output = format_output(&output);
+
+                if !is_7zip_successful(&formatted_output) {
+                    let _ = handle.emit(_7ZIP_EVENT_COMPLETE_WITH_ERROR, formatted_output);
+                    return;
+                }
 
                 let _ = handle.emit(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
             }
