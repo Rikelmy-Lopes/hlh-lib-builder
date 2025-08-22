@@ -21,6 +21,12 @@ function App() {
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
 
+  if (import.meta.env.PROD) {
+    window.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+  }
+
   async function start() {
     if (isRunning) return;
     if (origem.length === 0 || destino.length === 0) {
