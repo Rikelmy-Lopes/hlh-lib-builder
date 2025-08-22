@@ -1,13 +1,20 @@
-use crate::config::global::CREATE_NO_WINDOW_FLAG;
+use crate::config::constants::{BUILD_EXTENSION, CREATE_NO_WINDOW_FLAG};
 use std::{
     os::windows::process::CommandExt,
+    path::PathBuf,
     process::{Command, Output},
 };
 
-pub fn spawn_ant_build(_project_path: &str, ant_path: &str) -> Output {
+pub fn spawn_ant_build(ant_path: &str, origem: &str) -> Output {
+    let project_path = PathBuf::from(origem).join(BUILD_EXTENSION);
+
     Command::new(ant_path)
-        .args(["-q", "-f", &_project_path, "clean", "jar"])
-        /* .args(["-version"]) */
+        .arg("-q")
+        .arg("-f")
+        .arg(project_path)
+        .arg("clean")
+        .arg("jar")
+        /* .arg("-version") */
         .creation_flags(CREATE_NO_WINDOW_FLAG)
         .env_remove("ANT_HOME")
         .output()
@@ -15,11 +22,14 @@ pub fn spawn_ant_build(_project_path: &str, ant_path: &str) -> Output {
 }
 
 pub fn spawn_7zip(seven_zip_path: &str, origem: &str) -> Output {
-    let path = format!("{}\\{}", origem, "\\dist\\SIGP_INT.jar");
+    let build_file_path = PathBuf::from(origem).join("dist/SIGP_INT.jar");
+
     Command::new(seven_zip_path)
-        .args(["d", &path, "META-INF\\persistence.xml"])
+        .arg("d")
+        .arg(build_file_path)
+        .arg("META-INF/persistence.xml")
+        /* .arg("-version") */
         .creation_flags(CREATE_NO_WINDOW_FLAG)
-        /* .args(["-version"]) */
         .output()
         .expect("Falha ao executar o 7zip.")
 }

@@ -1,14 +1,17 @@
 mod config;
 mod utils;
 use crate::{
-    config::global::{ANT_COMMAND, ANT_RESOURCE_PATH, BUILD_EXTENSION, SEVEN_ZIP_RESOURCE_PATH},
+    config::constants::{
+        ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
+        ANT_RESOURCE_PATH, SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+    },
     utils::{
         commands::{spawn_7zip, spawn_ant_build},
         path::resolve_resource_path,
     },
 };
-use std::process::Output;
 use std::thread;
+use std::{path::PathBuf, process::Output};
 use tauri::{AppHandle, Emitter};
 
 fn format_output(output: &Output) -> String {
@@ -24,22 +27,21 @@ fn is_build_successful(output: &str) -> bool {
 }
 
 fn spawn_commands(handle: AppHandle, origem: String) {
-    let project_path = format!("{}\\{}", origem, BUILD_EXTENSION);
-    let ant_path = format!("{}{}", ANT_RESOURCE_PATH, ANT_COMMAND);
-    let seven_zip_path = format!("{}", SEVEN_ZIP_RESOURCE_PATH);
+    let ant_path = PathBuf::from(ANT_RESOURCE_PATH).join(ANT_COMMAND);
+    let seven_zip_path = PathBuf::from(SEVEN_ZIP_RESOURCE_PATH);
 
     thread::spawn(move || {
         match resolve_resource_path(&handle, &ant_path) {
             Some(path) => {
-                let output = spawn_ant_build(&project_path, &path);
+                let output = spawn_ant_build(&path, &origem);
                 let formatted_output = format_output(&output);
 
                 if !is_build_successful(&formatted_output) {
-                    let _ = handle.emit("ant-complete-with-error", formatted_output);
+                    let _ = handle.emit(ANT_EVENT_COMPLETE_WITH_ERROR, formatted_output);
                     return;
                 }
 
-                let _ = handle.emit("ant-complete-successful", formatted_output);
+                let _ = handle.emit(ANT_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do Ant!");
@@ -52,7 +54,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
                 let output = spawn_7zip(&path, &origem);
                 let formatted_output = format_output(&output);
 
-                let _ = handle.emit("7zip-complete-successful", formatted_output);
+                let _ = handle.emit(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
             }
             None => {
                 eprintln!("Falha ao encontrar o binario do 7zip!");
