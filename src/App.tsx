@@ -13,6 +13,7 @@ import {
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
+import { shouldStart } from "./dialog/prompt";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -38,6 +39,9 @@ function App() {
       return;
     }
     saveConfig(origem, destino);
+    if (!(await shouldStart())) {
+      return;
+    }
     setIsRunning(true);
     setListeners(setIsRunning, setLog);
     invoke("start", { origem });

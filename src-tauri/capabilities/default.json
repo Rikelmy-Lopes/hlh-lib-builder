@@ -34,6 +34,7 @@
       "allow": [
         "$HOME/*/**"
       ]
-    }
+    },
+    "dialog:default"
   ]
 }
