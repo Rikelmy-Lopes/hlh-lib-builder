@@ -23,6 +23,16 @@ function App() {
     window.addEventListener("contextmenu", (e) => {
       e.preventDefault();
     });
+
+    document.addEventListener("keydown", function (event) {
+      if (
+        event.key === "F5" ||
+        (event.ctrlKey && event.key === "r") ||
+        (event.metaKey && event.key === "r")
+      ) {
+        event.preventDefault();
+      }
+    });
   }
 
   async function start() {
