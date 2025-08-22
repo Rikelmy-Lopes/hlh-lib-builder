@@ -73,26 +73,26 @@ function App() {
       <div className="container-input">
         <input
           type="text"
-          name=""
-          id=""
           value={origem}
           placeholder="Origem"
           onChange={({ target }) => setOrigem(target.value.trim())}
           disabled={isRunning}
         />
-        <button onClick={() => chooseFolder(setOrigem)}>Escolher</button>
+        <button disabled={isRunning} onClick={() => chooseFolder(setOrigem)}>
+          Escolher
+        </button>
       </div>
       <div className="container-input">
         <input
           type="text"
-          name=""
-          id=""
           value={destino}
           placeholder="Destino"
           onChange={({ target }) => setDestino(target.value.trim())}
           disabled={isRunning}
         />
-        <button onClick={() => chooseFolder(setDestino)}>Escolher</button>
+        <button disabled={isRunning} onClick={() => chooseFolder(setDestino)}>
+          Escolher
+        </button>
       </div>
       <div className="container-button">
         <button disabled={isRunning} onClick={start}>
