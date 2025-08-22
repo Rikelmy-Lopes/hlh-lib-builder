@@ -2,11 +2,17 @@ import "./App.css";
 import "./css/loading-animation.css";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
-import { copyBuildFileToDestination, pathExists } from "./utils/fsUtils";
+import { copyBuildFileToDestination } from "./utils/fsUtils";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
 import { listen } from "@tauri-apps/api/event";
-import { _7ZIP_EVENT_COMPLETE_SUCCESSFUL, DESTINATION_LIB_PATH } from "./constants/constants";
+import {
+  _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+  DESTINATION_LIB_PATH,
+  ERROR_MESSAGES,
+} from "./constants/constants";
+import { join } from "@tauri-apps/api/path";
+import { exists } from "@tauri-apps/plugin-fs";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -16,14 +22,19 @@ function App() {
 
   async function start() {
     if (isRunning) return;
-    if (origem.length === 0 || destino.length === 0) return;
-
-    if (!(await pathExists(origem + "\\build.xml"))) {
-      setLog("Arquivo build.xml não encontrado na origem! Verifique o caminho do projeto!");
+    if (origem.length === 0 || destino.length === 0) {
+      setLog(ERROR_MESSAGES.PATHS_EMPTY);
       return;
     }
-    if (!(await pathExists(destino + DESTINATION_LIB_PATH))) {
-      setLog("Caminho de destino não encontrado! Verifique o caminho do projeto!");
+    const buildXmlPath = await join(origem, "build.xml");
+    const destinationLibPath = await join(destino, DESTINATION_LIB_PATH);
+
+    if (!(await exists(buildXmlPath))) {
+      setLog(ERROR_MESSAGES.BUILD_XML_NOT_FOUND);
+      return;
+    }
+    if (!(await exists(destinationLibPath))) {
+      setLog(ERROR_MESSAGES.DESTINATION_NOT_FOUND);
       return;
     }
     saveConfig(origem, destino);

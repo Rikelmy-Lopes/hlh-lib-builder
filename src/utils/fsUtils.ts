@@ -1,9 +1,5 @@
-import { exists, copyFile } from "@tauri-apps/plugin-fs";
+import { copyFile } from "@tauri-apps/plugin-fs";
 import { DESTINATION_LIB_PATH } from "../constants/constants";
-
-export async function pathExists(path: string) {
-  return await exists(path);
-}
 
 export async function copyBuildFileToDestination(origem: string, destino: string) {
   const fullOrigemPath = origem + "\\dist\\SIGP_INT.jar";
