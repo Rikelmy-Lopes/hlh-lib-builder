@@ -35,23 +35,35 @@ function App() {
     });
   }
 
-  async function start() {
-    if (isRunning) return;
-    if (origem.length === 0 || destino.length === 0) {
-      setLog(ERROR_MESSAGES.PATHS_EMPTY);
-      return;
+  async function validatePaths(): Promise<string | null> {
+    if (!origem || !destino) {
+      return ERROR_MESSAGES.PATHS_EMPTY;
     }
+
     const buildXmlPath = await join(origem, "build.xml");
     const destinationLibPath = await join(destino, DESTINATION_LIB_PATH);
 
     if (!(await exists(buildXmlPath))) {
-      setLog(ERROR_MESSAGES.BUILD_XML_NOT_FOUND);
-      return;
+      return ERROR_MESSAGES.BUILD_XML_NOT_FOUND;
     }
+
     if (!(await exists(destinationLibPath))) {
-      setLog(ERROR_MESSAGES.DESTINATION_NOT_FOUND);
+      return ERROR_MESSAGES.DESTINATION_NOT_FOUND;
+    }
+
+    return null;
+  }
+
+  async function start() {
+    if (isRunning) return;
+
+    const validationError = await validatePaths();
+
+    if (validationError) {
+      setLog(validationError);
       return;
     }
+
     saveConfig(origem, destino);
     if (!(await shouldStart())) {
       return;
