@@ -19,14 +19,13 @@
     {
       "identifier": "fs:allow-app-write",
       "allow": [
-        "$APPLOG/*/**",
         "$APPLOCALDATA/*/**"
       ]
     },
     {
       "identifier": "fs:allow-mkdir",
       "allow": [
-        "$APPLOG/*/**"
+        "$APPLOCALDATA/*/**"
       ]
     },
     {
@@ -35,6 +34,7 @@
         "$HOME/*/**"
       ]
     },
-    "dialog:default"
+    "dialog:default",
+    "log:default"
   ]
 }

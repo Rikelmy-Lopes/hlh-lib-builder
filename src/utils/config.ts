@@ -1,7 +1,7 @@
 import { BaseDirectory } from "@tauri-apps/api/path";
 import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { writeLog } from "./log";
 import { CONFIG_FILE } from "../constants/constants";
+import { warn } from "@tauri-apps/plugin-log";
 
 export async function saveConfig(origem: string, destino: string) {
   const settings = {
@@ -18,7 +18,7 @@ export async function saveConfig(origem: string, destino: string) {
     });
   } catch (e) {
     console.warn("Failed saving config: ", e);
-    writeLog("[WARN]" + " ->> " + (e as Error).message);
+    warn(`Failed saving config: ${(e as Error).message}`);
   }
 }
 
@@ -33,8 +33,8 @@ export async function loadConfig(): Promise<{ origem: string; destino: string }>
 
     return JSON.parse(data);
   } catch (e) {
-    console.warn("Failed to load config:", e);
-    writeLog("[WARN]" + " ->> " + e);
+    console.warn("Failed loading config:", e);
+    warn(`Failed loading config: ${(e as Error).message}`);
     return { origem: "", destino: "" };
   }
 }

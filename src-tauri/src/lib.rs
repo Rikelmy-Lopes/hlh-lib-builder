@@ -3,17 +3,19 @@ mod utils;
 use crate::{
     config::constants::{
         ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
-        ANT_RESOURCE_PATH, SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
-        _7ZIP_EVENT_COMPLETE_WITH_ERROR,
+        ANT_RESOURCE_PATH, EVENT_RESOURCE_ERROR, SEVEN_ZIP_RESOURCE_PATH,
+        _7ZIP_EVENT_COMPLETE_SUCCESSFUL, _7ZIP_EVENT_COMPLETE_WITH_ERROR,
     },
     utils::{
         commands::{spawn_7zip, spawn_ant_build},
         path::resolve_resource_path,
     },
 };
+use log::LevelFilter;
 use std::thread;
 use std::{path::PathBuf, process::Output};
 use tauri::{AppHandle, Emitter};
+use tauri_plugin_log::TimezoneStrategy;
 
 fn format_output(output: &Output) -> String {
     format!(
@@ -40,7 +42,6 @@ fn spawn_commands(handle: AppHandle, origem: String) {
             Some(path) => {
                 let output = spawn_ant_build(&path, &origem);
                 let formatted_output = format_output(&output);
-
                 if !is_build_successful(&formatted_output) {
                     let _ = handle.emit(ANT_EVENT_COMPLETE_WITH_ERROR, formatted_output);
                     return;
@@ -49,8 +50,8 @@ fn spawn_commands(handle: AppHandle, origem: String) {
                 let _ = handle.emit(ANT_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
             }
             None => {
-                eprintln!("Falha ao encontrar o binario do Ant!");
-                let _ = handle.emit("log", "Falha ao encontrar o binario do Ant!");
+                let _ = handle.emit(EVENT_RESOURCE_ERROR, "Falha ao encontrar o binario do Ant!");
+                return;
             }
         }
 
@@ -67,8 +68,11 @@ fn spawn_commands(handle: AppHandle, origem: String) {
                 let _ = handle.emit(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
             }
             None => {
-                eprintln!("Falha ao encontrar o binario do 7zip!");
-                let _ = handle.emit("log", "Falha ao encontrar o binario do 7zip!");
+                let _ = handle.emit(
+                    EVENT_RESOURCE_ERROR,
+                    "Falha ao encontrar o binario do 7zip!",
+                );
+                return;
             }
         }
     });
@@ -82,6 +86,13 @@ fn start(handle: AppHandle, origem: String) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .max_file_size(50_000)
+                .level(LevelFilter::Info)
+                .timezone_strategy(TimezoneStrategy::UseLocal)
+                .build(),
+        )
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![start])

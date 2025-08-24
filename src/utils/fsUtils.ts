@@ -1,7 +1,7 @@
 import { copyFile } from "@tauri-apps/plugin-fs";
 import { DESTINATION_LIB_PATH } from "../constants/constants";
 import { join } from "@tauri-apps/api/path";
-import { writeLog } from "./log";
+import { error } from "@tauri-apps/plugin-log";
 
 export async function copyBuildFileToDestination(origem: string, destino: string) {
   const jarFileName = "SIGP_INT.jar";
@@ -12,7 +12,7 @@ export async function copyBuildFileToDestination(origem: string, destino: string
     return true;
   } catch (e) {
     console.error("Failed copying jar file: ", e);
-    writeLog("[ERROR]" + " ->> " + (e as Error).message);
+    error(`Failed copying jar file: ${(e as Error).message}`);
     return false;
   }
 }
