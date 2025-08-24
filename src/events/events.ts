@@ -6,7 +6,7 @@ import {
   ANT_EVENT_COMPLETE_WITH_ERROR,
   EVENT_RESOURCE_ERROR,
 } from "../constants/constants";
-import { displayErrorDialog, displaySuccessfulDialog } from "../dialog/prompt";
+import { showSuccessDialog, showErrorDialog } from "../dialog/prompt";
 import { copyBuildFileToDestination } from "../utils/fsUtils";
 import { error, info } from "@tauri-apps/plugin-log";
 let isListenersRegistered = false;
@@ -19,7 +19,7 @@ function setAntListeners(setIsRunning: React.Dispatch<React.SetStateAction<boole
   listen<string>(ANT_EVENT_COMPLETE_WITH_ERROR, ({ payload }) => {
     error(`${ANT_EVENT_COMPLETE_WITH_ERROR} --> ${payload}`);
     setIsRunning(false);
-    displayErrorDialog(payload);
+    showErrorDialog(payload);
   });
 }
 
@@ -31,14 +31,14 @@ function set7zipListeners(
   listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async ({ payload }) => {
     info(`${_7ZIP_EVENT_COMPLETE_SUCCESSFUL} --> ${payload}`);
     const success = await copyBuildFileToDestination(origem, destino);
-    success ? displaySuccessfulDialog() : displayErrorDialog("Erro ao copiar arquivo de build!");
+    success ? showSuccessDialog() : showErrorDialog("Erro ao copiar arquivo .jar");
     setIsRunning(false);
   });
 
   listen<string>(_7ZIP_EVENT_COMPLETE_WITH_ERROR, ({ payload }) => {
     error(`${_7ZIP_EVENT_COMPLETE_WITH_ERROR} --> ${payload}`);
     setIsRunning(false);
-    displayErrorDialog(payload);
+    showErrorDialog(payload);
   });
 }
 
@@ -54,7 +54,7 @@ export function setListeners(
 
   listen<string>(EVENT_RESOURCE_ERROR, ({ payload }) => {
     setIsRunning(false);
-    displayErrorDialog(payload);
+    showErrorDialog(payload);
   });
 
   isListenersRegistered = true;

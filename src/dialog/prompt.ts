@@ -10,10 +10,10 @@ export async function chooseFolder(setState: React.Dispatch<React.SetStateAction
   setState(folder);
 }
 
-export async function displaySuccessfulDialog() {
+export async function showSuccessDialog() {
   await message("Concluído com sucesso!", { kind: "info" });
 }
 
-export async function displayErrorDialog(error: string) {
-  await message("Algo deu errado\n" + error, { kind: "error" });
+export async function showErrorDialog(error: string) {
+  await message(`Algo deu errado:\n${error}`, { kind: "error" });
 }
