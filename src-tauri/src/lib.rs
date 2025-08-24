@@ -8,30 +8,15 @@ use crate::{
     },
     utils::{
         commands::{spawn_7zip, spawn_ant_build},
+        output::{format_output, is_7zip_successful, is_build_successful},
         path::resolve_resource_path,
     },
 };
 use log::LevelFilter;
+use std::path::PathBuf;
 use std::thread;
-use std::{path::PathBuf, process::Output};
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_log::TimezoneStrategy;
-
-fn format_output(output: &Output) -> String {
-    format!(
-        "{}{}",
-        String::from_utf8_lossy(&output.stdout),
-        String::from_utf8_lossy(&output.stderr)
-    )
-}
-
-fn is_build_successful(output: &str) -> bool {
-    output.contains("BUILD SUCCESSFUL")
-}
-
-fn is_7zip_successful(output: &str) -> bool {
-    output.contains("Delete data from archive: 1 file")
-}
 
 fn spawn_commands(handle: AppHandle, origem: String) {
     let ant_path = PathBuf::from(ANT_RESOURCE_PATH).join(ANT_COMMAND);
@@ -42,6 +27,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
             Some(path) => {
                 let output = spawn_ant_build(&path, &origem);
                 let formatted_output = format_output(&output);
+
                 if !is_build_successful(&formatted_output) {
                     let _ = handle.emit(ANT_EVENT_COMPLETE_WITH_ERROR, formatted_output);
                     return;
