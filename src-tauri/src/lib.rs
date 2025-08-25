@@ -77,6 +77,9 @@ pub fn run() {
                 .max_file_size(50_000)
                 .level(LevelFilter::Info)
                 .timezone_strategy(TimezoneStrategy::UseLocal)
+                .filter(|metadata| {
+                    metadata.target() != "tao::platform_impl::platform::event_loop::runner"
+                })
                 .build(),
         )
         .plugin(tauri_plugin_dialog::init())
