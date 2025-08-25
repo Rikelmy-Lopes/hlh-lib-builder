@@ -20,19 +20,35 @@ function App() {
   const [destino, setDestino] = useState("");
 
   if (import.meta.env.PROD) {
-    window.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
+    const blockedKeys = ["f3", "f5", "f7", "f12"];
+    const blockedCtrl = ["r", "j", "u", "p", "f", "g", "s", "h"];
+    const blockedCtrlShift = ["i", "j", "c", "e", "k", "delete"];
 
-    document.addEventListener("keydown", function (event) {
+    window.addEventListener(
+      "contextmenu",
+      (e) => {
+        e.preventDefault();
+      },
+      true
+    );
+
+    const keyHandler = function (event: globalThis.KeyboardEvent) {
+      const key = event.key.toLowerCase();
+
       if (
-        event.key === "F5" ||
-        (event.ctrlKey && event.key === "r") ||
-        (event.metaKey && event.key === "r")
+        blockedKeys.includes(key) ||
+        (event.ctrlKey && blockedCtrl.includes(key)) ||
+        (event.ctrlKey && event.shiftKey && blockedCtrlShift.includes(key)) ||
+        (event.metaKey && ["r", "s"].includes(key)) // Added save for macOS
       ) {
         event.preventDefault();
+        event.stopPropagation();
+        return false; // Extra prevention
       }
-    });
+    };
+
+    document.addEventListener("keydown", keyHandler, true);
+    window.addEventListener("keydown", keyHandler, true);
   }
 
   async function validatePaths(): Promise<string | null> {
