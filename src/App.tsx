@@ -6,6 +6,7 @@ import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
 import {
   _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+  BUILD_EXTENSION,
   DESTINATION_LIB_PATH,
   ERROR_MESSAGES,
 } from "./constants/constants";
@@ -15,7 +16,7 @@ import { chooseFolder, shouldStart } from "./dialog/prompt";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
-  const [log, setLog] = useState("");
+  const [message, setMessage] = useState("");
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
 
@@ -56,7 +57,7 @@ function App() {
       return ERROR_MESSAGES.PATHS_EMPTY;
     }
 
-    const buildXmlPath = await join(origem, "build.xml");
+    const buildXmlPath = await join(origem, BUILD_EXTENSION);
     const destinationLibPath = await join(destino, DESTINATION_LIB_PATH);
 
     if (!(await exists(buildXmlPath))) {
@@ -76,7 +77,7 @@ function App() {
     const validationError = await validatePaths();
 
     if (validationError) {
-      setLog(validationError);
+      setMessage(validationError);
       return;
     }
 
@@ -90,12 +91,12 @@ function App() {
   }
 
   useEffect(() => {
-    if (log.length === 0) return;
+    if (message.length === 0) return;
 
     setTimeout(() => {
-      setLog("");
+      setMessage("");
     }, 3000);
-  }, [log]);
+  }, [message]);
 
   useEffect(() => {
     (async () => {
@@ -137,7 +138,7 @@ function App() {
           Executar
         </button>
         <div>
-          {log} {isRunning ? "Processo inicializado, aguarde!" : ""}
+          {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
         </div>
         <div className={isRunning ? "loader" : ""}></div>
       </div>
