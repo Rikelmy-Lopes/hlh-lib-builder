@@ -30,9 +30,12 @@
     },
     {
       "identifier": "fs:allow-copy-file",
-      "allow": [
-        "$HOME/*/**"
-      ]
+        "allow": [
+        {
+          "path": "*/**"
+        }
+      ],
+      "deny": ["C:/Windows", "C:/Program Files", "C:/Program Files (x86)", "C:/ProgramData"]
     },
     "dialog:default",
     "log:default"
