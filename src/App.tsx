@@ -12,7 +12,8 @@ import {
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import { chooseFolder, shouldStart } from "./dialog/prompt";
+import { chooseFolder, shouldStart, showErrorDialog } from "./dialog/prompt";
+import { error } from "@tauri-apps/plugin-log";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -73,21 +74,27 @@ function App() {
 
   async function start() {
     if (isRunning) return;
+    try {
+      const validationError = await validatePaths();
 
-    const validationError = await validatePaths();
+      if (validationError) {
+        setMessage(validationError);
+        return;
+      }
 
-    if (validationError) {
-      setMessage(validationError);
-      return;
+      await saveConfig(sourceProject, targetProject);
+      if (!(await shouldStart())) {
+        return;
+      }
+
+      setIsRunning(true);
+      setListeners(setIsRunning, sourceProject, targetProject);
+      await invoke("start", { sourceProject });
+    } catch (e) {
+      setIsRunning(false);
+      showErrorDialog((e as Error).message);
+      error(`Error executing the program: ${(e as Error).message}`);
     }
-
-    saveConfig(sourceProject, targetProject);
-    if (!(await shouldStart())) {
-      return;
-    }
-    setIsRunning(true);
-    setListeners(setIsRunning, sourceProject, targetProject);
-    invoke("start", { sourceProject });
   }
 
   useEffect(() => {
