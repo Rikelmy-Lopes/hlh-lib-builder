@@ -30,24 +30,26 @@ function App() {
       "contextmenu",
       (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        return false;
       },
       true
     );
 
-    const keyHandler = function (event: globalThis.KeyboardEvent) {
+    function keyHandler(event: globalThis.KeyboardEvent) {
       const key = event.key.toLowerCase();
 
       if (
         blockedKeys.includes(key) ||
         (event.ctrlKey && blockedCtrl.includes(key)) ||
         (event.ctrlKey && event.shiftKey && blockedCtrlShift.includes(key)) ||
-        (event.metaKey && ["r", "s"].includes(key)) // Added save for macOS
+        (event.metaKey && ["r", "s"].includes(key))
       ) {
         event.preventDefault();
         event.stopPropagation();
-        return false; // Extra prevention
+        return false;
       }
-    };
+    }
 
     document.addEventListener("keydown", keyHandler, true);
     window.addEventListener("keydown", keyHandler, true);

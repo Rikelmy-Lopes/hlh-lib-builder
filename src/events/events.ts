@@ -55,6 +55,7 @@ export function setListeners(
   listen<string>(EVENT_RESOURCE_ERROR, ({ payload }) => {
     setIsRunning(false);
     showErrorDialog(payload);
+    error(`${EVENT_RESOURCE_ERROR} --> ${payload}`);
   });
 
   isListenersRegistered = true;
