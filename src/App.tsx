@@ -17,8 +17,8 @@ import { chooseFolder, shouldStart } from "./dialog/prompt";
 function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [message, setMessage] = useState("");
-  const [origem, setOrigem] = useState("");
-  const [destino, setDestino] = useState("");
+  const [sourceProject, setSourceProject] = useState("");
+  const [targetProject, setTargetProject] = useState("");
 
   if (import.meta.env.PROD) {
     const blockedKeys = ["f3", "f5", "f7", "f12"];
@@ -53,12 +53,12 @@ function App() {
   }
 
   async function validatePaths(): Promise<string | null> {
-    if (!origem || !destino) {
+    if (!sourceProject || !targetProject) {
       return ERROR_MESSAGES.PATHS_EMPTY;
     }
 
-    const buildXmlPath = await join(origem, BUILD_EXTENSION);
-    const destinationLibPath = await join(destino, DESTINATION_LIB_PATH);
+    const buildXmlPath = await join(sourceProject, BUILD_EXTENSION);
+    const destinationLibPath = await join(targetProject, DESTINATION_LIB_PATH);
 
     if (!(await exists(buildXmlPath))) {
       return ERROR_MESSAGES.BUILD_XML_NOT_FOUND;
@@ -81,13 +81,13 @@ function App() {
       return;
     }
 
-    saveConfig(origem, destino);
+    saveConfig(sourceProject, targetProject);
     if (!(await shouldStart())) {
       return;
     }
     setIsRunning(true);
-    setListeners(setIsRunning, origem, destino);
-    invoke("start", { origem });
+    setListeners(setIsRunning, sourceProject, targetProject);
+    invoke("start", { sourceProject });
   }
 
   useEffect(() => {
@@ -100,10 +100,10 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const { origem, destino } = await loadConfig();
+      const { sourceProject, targetProject } = await loadConfig();
 
-      setOrigem(origem);
-      setDestino(destino);
+      setSourceProject(sourceProject);
+      setTargetProject(targetProject);
     })();
   }, []);
 
@@ -112,24 +112,24 @@ function App() {
       <div className="container-input">
         <input
           type="text"
-          value={origem}
+          value={sourceProject}
           placeholder="Origem (SIGP_INT)"
-          onChange={({ target }) => setOrigem(target.value.trim())}
+          onChange={({ target }) => setSourceProject(target.value.trim())}
           disabled={isRunning}
         />
-        <button disabled={isRunning} onClick={() => chooseFolder(setOrigem)}>
+        <button disabled={isRunning} onClick={() => chooseFolder(setSourceProject)}>
           Escolher
         </button>
       </div>
       <div className="container-input">
         <input
           type="text"
-          value={destino}
+          value={targetProject}
           placeholder="Destino (sigpintegrado)"
-          onChange={({ target }) => setDestino(target.value.trim())}
+          onChange={({ target }) => setTargetProject(target.value.trim())}
           disabled={isRunning}
         />
-        <button disabled={isRunning} onClick={() => chooseFolder(setDestino)}>
+        <button disabled={isRunning} onClick={() => chooseFolder(setTargetProject)}>
           Escolher
         </button>
       </div>

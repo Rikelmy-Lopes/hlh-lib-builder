@@ -5,13 +5,13 @@ use std::{
     process::{Command, Output},
 };
 
-pub fn spawn_ant_build(ant_path: &str, origem: &str) -> Output {
-    let project_path = PathBuf::from(origem).join(BUILD_EXTENSION);
+pub fn spawn_ant_build(ant_path: &str, source_project: &str) -> Output {
+    let source_project_path = PathBuf::from(source_project).join(BUILD_EXTENSION);
 
     Command::new(ant_path)
         .arg("-q")
         .arg("-f")
-        .arg(project_path)
+        .arg(source_project_path)
         .arg("clean")
         .arg("jar")
         /* .arg("-version") */
@@ -21,8 +21,8 @@ pub fn spawn_ant_build(ant_path: &str, origem: &str) -> Output {
         .expect("Falha ao executar o Apache Ant. Verifique se o caminho está correto.")
 }
 
-pub fn spawn_7zip(seven_zip_path: &str, origem: &str) -> Output {
-    let build_file_path = PathBuf::from(origem).join("dist/SIGP_INT.jar");
+pub fn spawn_7zip(seven_zip_path: &str, source_project: &str) -> Output {
+    let build_file_path = PathBuf::from(source_project).join("dist/SIGP_INT.jar");
 
     Command::new(seven_zip_path)
         .arg("d")

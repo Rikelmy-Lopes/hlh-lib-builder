@@ -18,14 +18,14 @@ use std::thread;
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_log::TimezoneStrategy;
 
-fn spawn_commands(handle: AppHandle, origem: String) {
+fn spawn_commands(handle: AppHandle, source_project: String) {
     let ant_path = PathBuf::from(ANT_RESOURCE_PATH).join(ANT_COMMAND);
     let seven_zip_path = PathBuf::from(SEVEN_ZIP_RESOURCE_PATH);
 
     thread::spawn(move || {
         match resolve_resource_path(&handle, &ant_path) {
             Some(path) => {
-                let output = spawn_ant_build(&path, &origem);
+                let output = spawn_ant_build(&path, &source_project);
                 let formatted_output = format_output(&output);
 
                 if !is_build_successful(&formatted_output) {
@@ -43,7 +43,7 @@ fn spawn_commands(handle: AppHandle, origem: String) {
 
         match resolve_resource_path(&handle, &seven_zip_path) {
             Some(path) => {
-                let output = spawn_7zip(&path, &origem);
+                let output = spawn_7zip(&path, &source_project);
                 let formatted_output = format_output(&output);
 
                 if !is_7zip_successful(&formatted_output) {
@@ -65,8 +65,8 @@ fn spawn_commands(handle: AppHandle, origem: String) {
 }
 
 #[tauri::command]
-fn start(handle: AppHandle, origem: String) {
-    spawn_commands(handle, origem);
+fn start(handle: AppHandle, source_project: String) {
+    spawn_commands(handle, source_project);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

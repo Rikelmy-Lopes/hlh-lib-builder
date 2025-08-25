@@ -3,10 +3,10 @@ import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-f
 import { CONFIG_FILE } from "../constants/constants";
 import { warn } from "@tauri-apps/plugin-log";
 
-export async function saveConfig(origem: string, destino: string) {
+export async function saveConfig(sourceProject: string, targetProject: string) {
   const settings = {
-    origem,
-    destino,
+    sourceProject,
+    targetProject,
   };
   try {
     if (!(await exists("config", { baseDir: BaseDirectory.AppLocalData }))) {
@@ -22,10 +22,10 @@ export async function saveConfig(origem: string, destino: string) {
   }
 }
 
-export async function loadConfig(): Promise<{ origem: string; destino: string }> {
+export async function loadConfig(): Promise<{ sourceProject: string; targetProject: string }> {
   try {
     if (!(await exists(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData }))) {
-      return { origem: "", destino: "" };
+      return { sourceProject: "", targetProject: "" };
     }
     const data = await readTextFile(CONFIG_FILE, {
       baseDir: BaseDirectory.AppLocalData,
@@ -35,6 +35,6 @@ export async function loadConfig(): Promise<{ origem: string; destino: string }>
   } catch (e) {
     console.warn("Failed loading config:", e);
     warn(`Failed loading config: ${(e as Error).message}`);
-    return { origem: "", destino: "" };
+    return { sourceProject: "", targetProject: "" };
   }
 }

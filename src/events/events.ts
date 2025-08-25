@@ -25,12 +25,12 @@ function setAntListeners(setIsRunning: React.Dispatch<React.SetStateAction<boole
 
 function set7zipListeners(
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
-  origem: string,
-  destino: string
+  sourceProject: string,
+  targetProject: string
 ) {
   listen<string>(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, async ({ payload }) => {
     info(`${_7ZIP_EVENT_COMPLETE_SUCCESSFUL} --> ${payload}`);
-    const success = await copyBuildFileToDestination(origem, destino);
+    const success = await copyBuildFileToDestination(sourceProject, targetProject);
     success ? showSuccessDialog() : showErrorDialog("Erro ao copiar arquivo .jar");
     setIsRunning(false);
   });
@@ -44,13 +44,13 @@ function set7zipListeners(
 
 export function setListeners(
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
-  origem: string,
-  destino: string
+  sourceProject: string,
+  targetProject: string
 ) {
   if (isListenersRegistered) return;
 
   setAntListeners(setIsRunning);
-  set7zipListeners(setIsRunning, origem, destino);
+  set7zipListeners(setIsRunning, sourceProject, targetProject);
 
   listen<string>(EVENT_RESOURCE_ERROR, ({ payload }) => {
     setIsRunning(false);
