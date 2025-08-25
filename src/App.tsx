@@ -113,7 +113,7 @@ function App() {
         <input
           type="text"
           value={origem}
-          placeholder="Origem"
+          placeholder="Origem (SIGP_INT)"
           onChange={({ target }) => setOrigem(target.value.trim())}
           disabled={isRunning}
         />
@@ -125,7 +125,7 @@ function App() {
         <input
           type="text"
           value={destino}
-          placeholder="Destino"
+          placeholder="Destino (sigpintegrado)"
           onChange={({ target }) => setDestino(target.value.trim())}
           disabled={isRunning}
         />
