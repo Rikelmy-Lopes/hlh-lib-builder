@@ -6,7 +6,7 @@ import {
   ANT_EVENT_COMPLETE_WITH_ERROR,
   EVENT_RESOURCE_ERROR,
 } from "../constants/constants";
-import { showSuccessDialog, showErrorDialog } from "../dialog/prompt";
+import { showSuccessDialog, showErrorDialog, showCancelDialog } from "../dialog/prompt";
 import { copyBuildFileToDestination } from "../utils/fsUtils";
 import { error, info } from "@tauri-apps/plugin-log";
 let isListenersRegistered = false;
@@ -56,6 +56,11 @@ export function setListeners(
     setIsRunning(false);
     showErrorDialog(payload);
     error(`${EVENT_RESOURCE_ERROR} --> ${payload}`);
+  });
+
+  listen("cancel-received", () => {
+    showCancelDialog();
+    setIsRunning(false);
   });
 
   isListenersRegistered = true;
