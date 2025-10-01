@@ -4,6 +4,7 @@ import {
   _7ZIP_EVENT_COMPLETE_WITH_ERROR,
   ANT_EVENT_COMPLETE_SUCCESSFUL,
   ANT_EVENT_COMPLETE_WITH_ERROR,
+  EVENT_CANCEL_RECEIVED,
   EVENT_RESOURCE_ERROR,
 } from "../constants/constants";
 import { showSuccessDialog, showErrorDialog, showCancelDialog } from "../dialog/prompt";
@@ -58,7 +59,7 @@ export function setListeners(
     error(`${EVENT_RESOURCE_ERROR} --> ${payload}`);
   });
 
-  listen("cancel-received", () => {
+  listen(EVENT_CANCEL_RECEIVED, () => {
     showCancelDialog();
     setIsRunning(false);
   });

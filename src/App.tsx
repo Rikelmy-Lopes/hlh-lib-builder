@@ -9,6 +9,7 @@ import {
   BUILD_EXTENSION,
   DESTINATION_LIB_PATH,
   ERROR_MESSAGES,
+  EVENT_CANCEL_SENT,
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
@@ -104,7 +105,7 @@ function App() {
     if (!(await shouldStop())) {
       return;
     }
-    await emit("cancel-sent");
+    await emit(EVENT_CANCEL_SENT);
   }
 
   useEffect(() => {

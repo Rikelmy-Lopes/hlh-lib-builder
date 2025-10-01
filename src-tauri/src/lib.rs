@@ -3,8 +3,9 @@ mod utils;
 use crate::{
     config::constants::{
         get_global, ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
-        ANT_RESOURCE_PATH, EVENT_RESOURCE_ERROR, IDS_LISTENERS, SEVEN_ZIP_RESOURCE_PATH,
-        _7ZIP_EVENT_COMPLETE_SUCCESSFUL, _7ZIP_EVENT_COMPLETE_WITH_ERROR,
+        ANT_RESOURCE_PATH, EVENT_CANCEL_RECEIVED, EVENT_CANCEL_SENT, EVENT_RESOURCE_ERROR,
+        IDS_LISTENERS, SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+        _7ZIP_EVENT_COMPLETE_WITH_ERROR,
     },
     utils::{
         arc_mutex::{lock_arc_mutex, new_arc_mutex, read_arc_mutex},
@@ -33,7 +34,6 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
     let seven_zip_path = PathBuf::from(SEVEN_ZIP_RESOURCE_PATH);
     let is_killed = new_arc_mutex(false);
     let is_killed_clone = Arc::clone(&is_killed);
-    let is_killed_clone2 = Arc::clone(&is_killed);
     remove_listeners(&handle);
 
     thread::spawn(move || {
@@ -42,7 +42,7 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
                 let child = spawn_ant_build(&path, &source_project);
                 let pid = child.id();
 
-                let id = handle.listen("cancel-sent", move |_e| {
+                let id = handle.listen(EVENT_CANCEL_SENT, move |_e| {
                     let mut is_killed = lock_arc_mutex(&is_killed);
                     *is_killed = kill_process(&pid);
                 });
@@ -53,7 +53,7 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
                 let is_killed = read_arc_mutex(&is_killed_clone);
 
                 if is_killed {
-                    let _ = handle.emit("cancel-received", "payload");
+                    let _ = handle.emit(EVENT_CANCEL_RECEIVED, "payload");
                     return;
                 }
 
@@ -72,10 +72,11 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
 
         match resolve_resource_path(&handle, &seven_zip_path) {
             Some(path) => {
+                let is_killed_clone2 = Arc::clone(&is_killed_clone);
                 let child = spawn_7zip(&path, &source_project);
                 let pid = child.id();
 
-                let id = handle.listen("cancel-sent", move |_e| {
+                let id = handle.listen(EVENT_CANCEL_SENT, move |_e| {
                     let mut is_killed = lock_arc_mutex(&is_killed_clone);
 
                     *is_killed = kill_process(&pid);
@@ -85,9 +86,9 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
 
                 let formatted_output = format_output(child.wait_with_output().unwrap());
 
-                let is_killed_lock = read_arc_mutex(&is_killed_clone2);
-                if is_killed_lock {
-                    let _ = handle.emit("cancel-received", "payload");
+                let is_killed = read_arc_mutex(&is_killed_clone2);
+                if is_killed {
+                    let _ = handle.emit(EVENT_CANCEL_RECEIVED, "payload");
                     return;
                 }
 
