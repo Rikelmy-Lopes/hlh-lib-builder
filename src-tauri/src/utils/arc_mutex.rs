@@ -19,15 +19,3 @@ pub fn read_arc_mutex<T: Clone>(data: &Arc<Mutex<T>>) -> T {
 pub fn lock_arc_mutex<'a, T>(data: &'a Arc<Mutex<T>>) -> MutexGuard<'a, T> {
     data.lock().unwrap()
 }
-
-/// Cria uma nova `Arc<Mutex<T>>` com valor derivado de outra variável.
-/// Executa a função `func` passando uma referência ao valor original para gerar o novo valor.
-/// O valor original não é alterado.
-pub fn derive_arc_mutex<T, F>(data: &Arc<Mutex<T>>, func: F) -> Arc<Mutex<T>>
-where
-    T: Clone,
-    F: FnOnce(&T) -> T,
-{
-    let lock = data.lock().expect("Failed to lock mutex");
-    Arc::new(Mutex::new(func(&lock)))
-}

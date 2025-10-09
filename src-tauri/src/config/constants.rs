@@ -1,5 +1,3 @@
-use std::sync::Mutex;
-
 pub const ANT_EVENT_COMPLETE_SUCCESSFUL: &str = "ant_complete_successful";
 pub const ANT_EVENT_COMPLETE_WITH_ERROR: &str = "ant_complete_with_error";
 pub const _7ZIP_EVENT_COMPLETE_SUCCESSFUL: &str = "7zip_complete_successful";
