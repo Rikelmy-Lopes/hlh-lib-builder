@@ -4,6 +4,10 @@ export async function shouldStart() {
   return await ask("Começar a executar?", { kind: "warning" });
 }
 
+export async function shouldStop() {
+  return await ask("Tem certeza que deseja parar?", { kind: "warning" });
+}
+
 export async function chooseFolder(setState: React.Dispatch<React.SetStateAction<string>>) {
   const folder = await open({ directory: true });
   if (folder === null) return;
@@ -12,6 +16,10 @@ export async function chooseFolder(setState: React.Dispatch<React.SetStateAction
 
 export async function showSuccessDialog() {
   await message("Concluído com sucesso!", { kind: "info" });
+}
+
+export async function showCancelDialog() {
+  await message("Execução parada!", { kind: "info" });
 }
 
 export async function showErrorDialog(error: string) {

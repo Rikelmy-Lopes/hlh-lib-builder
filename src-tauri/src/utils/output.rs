@@ -1,6 +1,6 @@
 use std::process::Output;
 
-pub fn format_output(output: &Output) -> String {
+pub fn format_output(output: Output) -> String {
     format!(
         "{}{}",
         String::from_utf8_lossy(&output.stdout),

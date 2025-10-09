@@ -9,11 +9,13 @@ import {
   BUILD_EXTENSION,
   DESTINATION_LIB_PATH,
   ERROR_MESSAGES,
+  EVENT_CANCEL_SENT,
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import { chooseFolder, shouldStart, showErrorDialog } from "./dialog/prompt";
+import { chooseFolder, shouldStart, shouldStop, showErrorDialog } from "./dialog/prompt";
 import { error } from "@tauri-apps/plugin-log";
+import { emit } from "@tauri-apps/api/event";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -99,6 +101,13 @@ function App() {
     }
   }
 
+  async function stop() {
+    if (!(await shouldStop())) {
+      return;
+    }
+    await emit(EVENT_CANCEL_SENT);
+  }
+
   useEffect(() => {
     if (message.length === 0) return;
 
@@ -145,6 +154,9 @@ function App() {
       <div className="container-button">
         <button disabled={isRunning} onClick={start}>
           Executar
+        </button>
+        <button disabled={!isRunning} onClick={stop}>
+          Cancelar
         </button>
         <div>
           {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
