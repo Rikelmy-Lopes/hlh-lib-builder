@@ -32,7 +32,7 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
                 let child = spawn_ant_build(&path, &source_project);
                 let pid = child.id();
 
-                let id = handle.listen(EVENT_CANCEL_SENT, move |_e| {
+                let cancel_listener = handle.listen(EVENT_CANCEL_SENT, move |_e| {
                     let mut is_killed = lock_arc_mutex(&is_killed);
                     *is_killed = kill_process(&pid);
                 });
@@ -42,17 +42,16 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
 
                 if is_killed {
                     let _ = handle.emit(EVENT_CANCEL_RECEIVED, "payload");
-                    handle.unlisten(id);
-                    return;
                 } else if !is_build_successful(&formatted_output) {
-                    let _ = handle.emit(ANT_EVENT_COMPLETE_WITH_ERROR, formatted_output);
-                    handle.unlisten(id);
-                    return;
+                    let _ = handle.emit(ANT_EVENT_COMPLETE_WITH_ERROR, &formatted_output);
                 } else {
-                    let _ = handle.emit(ANT_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
+                    let _ = handle.emit(ANT_EVENT_COMPLETE_SUCCESSFUL, &formatted_output);
                 }
 
-                handle.unlisten(id);
+                handle.unlisten(cancel_listener);
+                if is_killed || !is_build_successful(&formatted_output) {
+                    return;
+                }
             }
             None => {
                 let _ = handle.emit(EVENT_RESOURCE_ERROR, "Falha ao encontrar o binario do Ant!");
@@ -66,9 +65,8 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
                 let child = spawn_7zip(&path, &source_project);
                 let pid = child.id();
 
-                let id = handle.listen(EVENT_CANCEL_SENT, move |_e| {
+                let cancel_listener = handle.listen(EVENT_CANCEL_SENT, move |_e| {
                     let mut is_killed = lock_arc_mutex(&is_killed_clone);
-
                     *is_killed = kill_process(&pid);
                 });
 
@@ -83,7 +81,7 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
                     let _ = handle.emit(_7ZIP_EVENT_COMPLETE_SUCCESSFUL, formatted_output);
                 }
 
-                handle.unlisten(id);
+                handle.unlisten(cancel_listener);
             }
             None => {
                 let _ = handle.emit(
