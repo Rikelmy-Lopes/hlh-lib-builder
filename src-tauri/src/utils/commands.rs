@@ -44,6 +44,7 @@ pub fn spawn_7zip(seven_zip_path: &str, source_project: &str) -> Child {
 pub fn kill_process(pid: &u32) -> bool {
     let result = Command::new("taskkill")
         .args(["/f", "/pid", &pid.to_string(), "/t"])
+        .creation_flags(CREATE_NO_WINDOW_FLAG)
         .output();
 
     match result {
