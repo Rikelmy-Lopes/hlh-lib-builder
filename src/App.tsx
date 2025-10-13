@@ -10,12 +10,20 @@ import {
   DESTINATION_LIB_PATH,
   ERROR_MESSAGES,
   EVENT_CANCEL_SENT,
+  EVENT_REUSE_FILE,
 } from "./constants/constants";
 import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
-import { chooseFolder, shouldStart, shouldStop, showErrorDialog } from "./dialog/prompt";
+import {
+  chooseFolder,
+  shouldStart,
+  shouldStop,
+  shouldUseRecentFile,
+  showErrorDialog,
+} from "./dialog/prompt";
 import { error } from "@tauri-apps/plugin-log";
 import { emit } from "@tauri-apps/api/event";
+import { isBuildFileRecent } from "./utils/fsUtils";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -91,8 +99,16 @@ function App() {
         return;
       }
 
-      setIsRunning(true);
       setListeners(setIsRunning, sourceProject, targetProject);
+
+      if (await isBuildFileRecent(sourceProject)) {
+        if (await shouldUseRecentFile()) {
+          await emit(EVENT_REUSE_FILE);
+          return;
+        }
+      }
+
+      setIsRunning(true);
       await invoke("start", { sourceProject });
     } catch (e) {
       setIsRunning(false);

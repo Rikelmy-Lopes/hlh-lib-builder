@@ -6,6 +6,7 @@ import {
   ANT_EVENT_COMPLETE_WITH_ERROR,
   EVENT_CANCEL_RECEIVED,
   EVENT_RESOURCE_ERROR,
+  EVENT_REUSE_FILE,
 } from "../constants/constants";
 import { showSuccessDialog, showErrorDialog, showCancelDialog } from "../dialog/prompt";
 import { copyBuildFileToDestination } from "../utils/fsUtils";
@@ -52,6 +53,12 @@ export function setListeners(
 
   setAntListeners(setIsRunning);
   set7zipListeners(setIsRunning, sourceProject, targetProject);
+
+  listen(EVENT_REUSE_FILE, async ({}) => {
+    info(`${EVENT_REUSE_FILE} -->`);
+    const success = await copyBuildFileToDestination(sourceProject, targetProject);
+    success ? showSuccessDialog() : showErrorDialog("Erro ao copiar arquivo .jar");
+  });
 
   listen<string>(EVENT_RESOURCE_ERROR, ({ payload }) => {
     setIsRunning(false);

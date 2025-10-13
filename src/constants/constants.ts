@@ -5,6 +5,7 @@ export const _7ZIP_EVENT_COMPLETE_WITH_ERROR = "7zip_complete_with_error";
 export const EVENT_RESOURCE_ERROR = "resource_error";
 export const EVENT_CANCEL_SENT = "cancel_sent";
 export const EVENT_CANCEL_RECEIVED = "cancel_received";
+export const EVENT_REUSE_FILE = "event_reuse_file";
 export const DESTINATION_LIB_PATH = "/src/main/webapp/WEB-INF/lib";
 export const CONFIG_FILE = "config/settings.json";
 export const BUILD_EXTENSION = "build.xml";
