@@ -22,12 +22,12 @@ export async function isBuildFileRecent(sourceProject: string) {
     const fullSourceProjectPath = await join(sourceProject, "dist", JAR_FILE_NAME);
     const fileInfo = await stat(fullSourceProjectPath);
 
-    if (!fileInfo.birthtime) {
+    if (!fileInfo.mtime) {
       return false;
     }
 
     const now = new Date();
-    const isNewerThanTwoDays = now.getTime() - fileInfo.birthtime.getTime() < millisecondsInTwoDays;
+    const isNewerThanTwoDays = now.getTime() - fileInfo.mtime.getTime() < millisecondsInTwoDays;
 
     return isNewerThanTwoDays;
   } catch (e) {
