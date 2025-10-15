@@ -1,5 +1,5 @@
 export function blockDevTools() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.PROD) {
     const blockedKeys = ["f3", "f5", "f7", "f12"];
     const blockedCtrl = ["r", "j", "u", "p", "f", "g", "s", "h"];
     const blockedCtrlShift = ["i", "j", "c", "e", "k", "delete"];
