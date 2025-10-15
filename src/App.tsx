@@ -4,90 +4,25 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
-import {
-  _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
-  BUILD_EXTENSION,
-  DESTINATION_LIB_PATH,
-  ERROR_MESSAGES,
-  EVENT_CANCEL_SENT,
-  EVENT_REUSE_FILE,
-} from "./constants/constants";
-import { join } from "@tauri-apps/api/path";
-import { exists } from "@tauri-apps/plugin-fs";
-import {
-  chooseFolder,
-  shouldStart,
-  shouldStop,
-  shouldUseRecentFile,
-  showErrorDialog,
-} from "./dialog/prompt";
+import { _7ZIP_EVENT_COMPLETE_SUCCESSFUL, EVENT_CANCEL_SENT, EVENT_REUSE_FILE } from "./constants/constants";
+import { chooseFolder, shouldStart, shouldStop, shouldUseRecentFile, showErrorDialog } from "./dialog/prompt";
 import { error } from "@tauri-apps/plugin-log";
 import { emit } from "@tauri-apps/api/event";
 import { isBuildFileRecent } from "./utils/fsUtils";
+import { validatePaths } from "./utils/pathValidator";
+import { blockDevTools } from "./utils/blockDevTools";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [message, setMessage] = useState("");
   const [sourceProject, setSourceProject] = useState("");
   const [targetProject, setTargetProject] = useState("");
-
-  if (import.meta.env.PROD) {
-    const blockedKeys = ["f3", "f5", "f7", "f12"];
-    const blockedCtrl = ["r", "j", "u", "p", "f", "g", "s", "h"];
-    const blockedCtrlShift = ["i", "j", "c", "e", "k", "delete"];
-
-    window.addEventListener(
-      "contextmenu",
-      (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      },
-      true
-    );
-
-    function keyHandler(event: globalThis.KeyboardEvent) {
-      const key = event.key.toLowerCase();
-
-      if (
-        blockedKeys.includes(key) ||
-        (event.ctrlKey && blockedCtrl.includes(key)) ||
-        (event.ctrlKey && event.shiftKey && blockedCtrlShift.includes(key)) ||
-        (event.metaKey && ["r", "s"].includes(key))
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
-      }
-    }
-
-    document.addEventListener("keydown", keyHandler, true);
-    window.addEventListener("keydown", keyHandler, true);
-  }
-
-  async function validatePaths(): Promise<string | null> {
-    if (!sourceProject || !targetProject) {
-      return ERROR_MESSAGES.PATHS_EMPTY;
-    }
-
-    const buildXmlPath = await join(sourceProject, BUILD_EXTENSION);
-    const destinationLibPath = await join(targetProject, DESTINATION_LIB_PATH);
-
-    if (!(await exists(buildXmlPath))) {
-      return ERROR_MESSAGES.BUILD_XML_NOT_FOUND;
-    }
-
-    if (!(await exists(destinationLibPath))) {
-      return ERROR_MESSAGES.DESTINATION_NOT_FOUND;
-    }
-
-    return null;
-  }
+  blockDevTools();
 
   async function start() {
     if (isRunning) return;
     try {
-      const validationError = await validatePaths();
+      const validationError = await validatePaths(sourceProject, targetProject);
 
       if (validationError) {
         setMessage(validationError);

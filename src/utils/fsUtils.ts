@@ -1,7 +1,7 @@
 import { copyFile, stat } from "@tauri-apps/plugin-fs";
 import { DESTINATION_LIB_PATH, JAR_FILE_NAME } from "../constants/constants";
 import { join } from "@tauri-apps/api/path";
-import { error } from "@tauri-apps/plugin-log";
+import { error, warn } from "@tauri-apps/plugin-log";
 
 export async function copyBuildFileToDestination(sourceProject: string, targetProject: string) {
   try {
@@ -31,6 +31,8 @@ export async function isBuildFileRecent(sourceProject: string) {
 
     return isNewerThanTwoDays;
   } catch (e) {
+    console.warn("An error occurred: ", e);
+    warn(`An error occurred: ${(e as Error).message}`);
     return false;
   }
 }
