@@ -10,8 +10,8 @@ export async function copyBuildFileToDestination(sourceProject: string, targetPr
     await copyFile(fullSourceProjectPath, fullTargetProjectPath);
     return true;
   } catch (e) {
-    console.error("Failed copying jar file: ", e);
-    error(`Failed copying jar file: ${(e as Error).message}`);
+    console.error(`Failed copying jar file: ${e}`);
+    error(`Failed copying jar file: ${e}`);
     return false;
   }
 }
@@ -31,8 +31,8 @@ export async function isBuildFileRecent(sourceProject: string) {
 
     return isNewerThanTwoDays;
   } catch (e) {
-    console.warn("An error occurred: ", e);
-    warn(`An error occurred: ${(e as Error).message}`);
+    console.warn(`An error occurred: ${e}`);
+    warn(`An error occurred: ${e}`);
     return false;
   }
 }
