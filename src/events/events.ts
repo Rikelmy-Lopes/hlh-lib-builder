@@ -54,11 +54,14 @@ export function setListeners(
   setAntListeners(setIsRunning);
   set7zipListeners(setIsRunning, sourceProject, targetProject);
 
-  listen(EVENT_REUSE_FILE, async ({}) => {
-    info(`${EVENT_REUSE_FILE} -->`);
-    const success = await copyBuildFileToDestination(sourceProject, targetProject);
-    success ? showSuccessDialog() : showErrorDialog("Erro ao copiar arquivo .jar");
-  });
+  listen<{ sourceProject: string; targetProject: string }>(
+    EVENT_REUSE_FILE,
+    async ({ payload: { sourceProject, targetProject } }) => {
+      info(`${EVENT_REUSE_FILE} -->`);
+      const success = await copyBuildFileToDestination(sourceProject, targetProject);
+      success ? showSuccessDialog() : showErrorDialog("Erro ao copiar arquivo .jar");
+    }
+  );
 
   listen<string>(EVENT_RESOURCE_ERROR, ({ payload }) => {
     setIsRunning(false);

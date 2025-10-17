@@ -38,7 +38,7 @@ function App() {
 
       if (await isBuildFileRecent(sourceProject)) {
         if (await shouldUseRecentFile()) {
-          await emit(EVENT_REUSE_FILE);
+          await emit(EVENT_REUSE_FILE, { sourceProject, targetProject });
           return;
         }
       }
