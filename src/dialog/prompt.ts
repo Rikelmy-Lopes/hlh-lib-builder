@@ -10,7 +10,7 @@ export async function shouldStop() {
 
 export async function shouldUseRecentFile() {
   return await ask(
-    "Um arquivo '.jar' ja existe no caminho de origem\nDeseja reutilizar ou criar um novo? ",
+    "Um arquivo 'jar' ja existe no caminho de origem\nDeseja reutilizar ou criar um novo?\n Data do arquivo: 04/11/2025 ",
     {
       kind: "warning",
       okLabel: "Reutilizar",
