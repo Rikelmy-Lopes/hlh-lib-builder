@@ -17,6 +17,11 @@
       "deny": ["C:/Windows", "C:/Program Files", "C:/Program Files (x86)", "C:/ProgramData"]
     },
     {
+      "identifier": "fs:allow-stat",
+      "allow": ["*/**"],
+      "deny": ["C:/Windows", "C:/Program Files", "C:/Program Files (x86)", "C:/ProgramData"]
+    },
+    {
       "identifier": "fs:allow-app-write",
       "allow": ["$APPLOCALDATA/*/**"]
     },

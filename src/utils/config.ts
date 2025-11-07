@@ -17,8 +17,8 @@ export async function saveConfig(sourceProject: string, targetProject: string) {
       baseDir: BaseDirectory.AppLocalData,
     });
   } catch (e) {
-    console.warn("Failed saving config: ", e);
-    warn(`Failed saving config: ${(e as Error).message}`);
+    console.warn(`Failed saving config: ${e}`);
+    warn(`Failed saving config: ${e}`);
   }
 }
 
@@ -33,8 +33,8 @@ export async function loadConfig(): Promise<{ sourceProject: string; targetProje
 
     return JSON.parse(data);
   } catch (e) {
-    console.warn("Failed loading config:", e);
-    warn(`Failed loading config: ${(e as Error).message}`);
+    console.warn(`Failed loading config: ${e}`);
+    warn(`Failed loading config: ${e}`);
     return { sourceProject: "", targetProject: "" };
   }
 }

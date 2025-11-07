@@ -1,7 +1,7 @@
-import { copyFile } from "@tauri-apps/plugin-fs";
+import { copyFile, stat } from "@tauri-apps/plugin-fs";
 import { DESTINATION_LIB_PATH, JAR_FILE_NAME } from "../constants/constants";
 import { join } from "@tauri-apps/api/path";
-import { error } from "@tauri-apps/plugin-log";
+import { error, warn } from "@tauri-apps/plugin-log";
 
 export async function copyBuildFileToDestination(sourceProject: string, targetProject: string) {
   try {
@@ -10,8 +10,29 @@ export async function copyBuildFileToDestination(sourceProject: string, targetPr
     await copyFile(fullSourceProjectPath, fullTargetProjectPath);
     return true;
   } catch (e) {
-    console.error("Failed copying jar file: ", e);
-    error(`Failed copying jar file: ${(e as Error).message}`);
+    console.error(`Failed copying jar file: ${e}`);
+    error(`Failed copying jar file: ${e}`);
+    return false;
+  }
+}
+
+export async function isBuildFileRecent(sourceProject: string) {
+  const millisecondsInTwoDays = 2 * 24 * 60 * 60 * 1000;
+  try {
+    const fullSourceProjectPath = await join(sourceProject, "dist", JAR_FILE_NAME);
+    const fileInfo = await stat(fullSourceProjectPath);
+
+    if (!fileInfo.mtime) {
+      return false;
+    }
+
+    const now = new Date();
+    const isNewerThanTwoDays = now.getTime() - fileInfo.mtime.getTime() < millisecondsInTwoDays;
+
+    return isNewerThanTwoDays;
+  } catch (e) {
+    console.warn(`An error occurred: ${e}`);
+    warn(`An error occurred: ${e}`);
     return false;
   }
 }
