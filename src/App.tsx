@@ -16,7 +16,7 @@ import { emit } from "@tauri-apps/api/event";
 import { isBuildFileRecent } from "./utils/fsUtils";
 import { validatePaths } from "./utils/pathValidator";
 import { blockDevTools } from "./utils/blockDevTools";
-import { Alert, Button, createTheme, CssBaseline, TextField, ThemeProvider } from "@mui/material";
+import { Alert, Button, createTheme, CssBaseline, Stack, TextField, ThemeProvider } from "@mui/material";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -98,14 +98,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main className="container">
-        <div className="container-input">
-          {/*         <input
-          type="text"
-          value={sourceProject}
-          placeholder="Origem (SIGP_INT)"
-          onChange={({ target }) => setSourceProject(target.value.trim())}
-          disabled={isRunning}
-        /> */}
+        <Stack direction="row" gap={1} margin={1} height={50}>
           <TextField
             id="outlined-basic"
             value={sourceProject}
@@ -119,8 +112,8 @@ function App() {
           <Button disabled={isRunning} onClick={() => chooseFolder(setSourceProject)} variant="contained">
             Escolher
           </Button>
-        </div>
-        <div className="container-input">
+        </Stack>
+        <Stack direction="row" gap={1} margin={1} height={50}>
           <TextField
             value={targetProject}
             onChange={({ target }) => setTargetProject(target.value.trim())}
@@ -133,8 +126,8 @@ function App() {
           <Button disabled={isRunning} onClick={() => chooseFolder(setTargetProject)} variant="contained">
             Escolher
           </Button>
-        </div>
-        <div className="container-button">
+        </Stack>
+        <Stack spacing={2} gap={1} margin={1} alignItems={"center"}>
           <Button disabled={isRunning} onClick={start} variant="contained">
             Executar
           </Button>
@@ -142,17 +135,17 @@ function App() {
             Cancelar
           </Button>
           {isRunning && (
-            <Alert variant="outlined" severity="info">
+            <Alert variant="filled" severity="info">
               Processo inicializado, aguarde!
             </Alert>
           )}
           {message && (
-            <Alert variant="outlined" severity="warning">
+            <Alert variant="filled" severity="warning">
               {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
             </Alert>
           )}
           <div className={isRunning ? "loader" : ""}></div>
-        </div>
+        </Stack>
       </main>
     </ThemeProvider>
   );
