@@ -1,4 +1,9 @@
 import "./App.css";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
 import "./css/loading-animation.css";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
@@ -11,6 +16,7 @@ import { emit } from "@tauri-apps/api/event";
 import { isBuildFileRecent } from "./utils/fsUtils";
 import { validatePaths } from "./utils/pathValidator";
 import { blockDevTools } from "./utils/blockDevTools";
+import { Alert, Button, createTheme, CssBaseline, TextField, ThemeProvider } from "@mui/material";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -18,6 +24,18 @@ function App() {
   const [sourceProject, setSourceProject] = useState("");
   const [targetProject, setTargetProject] = useState("");
   blockDevTools();
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: {
+        main: "#1976d2",
+      },
+      background: {
+        default: " #252525ff",
+      },
+    },
+  });
 
   async function start() {
     if (isRunning) return;
@@ -77,44 +95,66 @@ function App() {
   }, []);
 
   return (
-    <main className="container">
-      <div className="container-input">
-        <input
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <main className="container">
+        <div className="container-input">
+          {/*         <input
           type="text"
           value={sourceProject}
           placeholder="Origem (SIGP_INT)"
           onChange={({ target }) => setSourceProject(target.value.trim())}
           disabled={isRunning}
-        />
-        <button disabled={isRunning} onClick={() => chooseFolder(setSourceProject)}>
-          Escolher
-        </button>
-      </div>
-      <div className="container-input">
-        <input
-          type="text"
-          value={targetProject}
-          placeholder="Destino (sigpintegrado)"
-          onChange={({ target }) => setTargetProject(target.value.trim())}
-          disabled={isRunning}
-        />
-        <button disabled={isRunning} onClick={() => chooseFolder(setTargetProject)}>
-          Escolher
-        </button>
-      </div>
-      <div className="container-button">
-        <button disabled={isRunning} onClick={start}>
-          Executar
-        </button>
-        <button disabled={!isRunning} onClick={stop}>
-          Cancelar
-        </button>
-        <div>
-          {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
+        /> */}
+          <TextField
+            id="outlined-basic"
+            value={sourceProject}
+            disabled={isRunning}
+            onChange={({ target }) => setSourceProject(target.value.trim())}
+            fullWidth={true}
+            required={true}
+            label="Origem (SIGP_INT)"
+            variant="outlined"
+          />
+          <Button disabled={isRunning} onClick={() => chooseFolder(setSourceProject)} variant="contained">
+            Escolher
+          </Button>
         </div>
-        <div className={isRunning ? "loader" : ""}></div>
-      </div>
-    </main>
+        <div className="container-input">
+          <TextField
+            value={targetProject}
+            onChange={({ target }) => setTargetProject(target.value.trim())}
+            disabled={isRunning}
+            required={true}
+            fullWidth={true}
+            label="Destino (sigpintegrado)"
+            variant="outlined"
+          />
+          <Button disabled={isRunning} onClick={() => chooseFolder(setTargetProject)} variant="contained">
+            Escolher
+          </Button>
+        </div>
+        <div className="container-button">
+          <Button disabled={isRunning} onClick={start} variant="contained">
+            Executar
+          </Button>
+          <Button disabled={!isRunning} onClick={stop} variant="contained">
+            Cancelar
+          </Button>
+          {isRunning && (
+            <Alert variant="outlined" severity="info">
+              Processo inicializado, aguarde!
+            </Alert>
+          )}
+          {message && (
+            <Alert variant="outlined" severity="warning">
+              {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
+            </Alert>
+          )}
+          <div className={isRunning ? "loader" : ""}></div>
+        </div>
+      </main>
+    </ThemeProvider>
   );
 }
 
