@@ -4,7 +4,6 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import "./css/loading-animation.css";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { setListeners } from "./events/events";
@@ -98,7 +97,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main className="container">
-        <Stack direction="row" gap={1} margin={1} height={50}>
+        <Stack direction="row" gap={1} margin={1} height={50} alignItems={"center"}>
           <TextField
             id="outlined-basic"
             value={sourceProject}
@@ -113,7 +112,7 @@ function App() {
             Escolher
           </Button>
         </Stack>
-        <Stack direction="row" gap={1} margin={1} height={50}>
+        <Stack direction="row" gap={1} margin={1} height={50} alignItems={"center"}>
           <TextField
             value={targetProject}
             onChange={({ target }) => setTargetProject(target.value.trim())}
@@ -127,15 +126,15 @@ function App() {
             Escolher
           </Button>
         </Stack>
-        <Stack spacing={2} gap={1} margin={1} alignItems={"center"}>
-          <Button disabled={isRunning} onClick={start} variant="contained">
-            Executar
+        <Stack spacing={1} gap={1} margin={1} alignItems={"center"}>
+          <Button disabled={isRunning} onClick={start} loading={isRunning} loadingPosition="end" variant="contained">
+            {isRunning ? "Executando..." : "Executar"}
           </Button>
           <Button disabled={!isRunning} onClick={stop} variant="contained">
             Cancelar
           </Button>
           {isRunning && (
-            <Alert variant="filled" severity="info">
+            <Alert variant="filled" severity="info" sx={{ color: "white" }}>
               Processo inicializado, aguarde!
             </Alert>
           )}
@@ -144,7 +143,6 @@ function App() {
               {message} {isRunning ? "Processo inicializado, aguarde!" : ""}
             </Alert>
           )}
-          <div className={isRunning ? "loader" : ""}></div>
         </Stack>
       </main>
     </ThemeProvider>
