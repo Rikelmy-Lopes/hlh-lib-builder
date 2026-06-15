@@ -2,9 +2,8 @@ mod config;
 mod utils;
 use crate::{
     config::constants::{
-        ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
-        ANT_RESOURCE_PATH, EVENT_CANCEL_RECEIVED, EVENT_CANCEL_SENT, EVENT_RESOURCE_ERROR,
-        SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL, _7ZIP_EVENT_COMPLETE_WITH_ERROR,
+        _7ZIP_EVENT_COMPLETE_SUCCESSFUL, _7ZIP_EVENT_COMPLETE_WITH_ERROR, ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
+        ANT_RESOURCE_PATH, BUILD_EXTENSION, EVENT_CANCEL_RECEIVED, EVENT_CANCEL_SENT, EVENT_RESOURCE_ERROR, SEVEN_ZIP_RESOURCE_PATH
     },
     utils::{
         arc_mutex::{lock_arc_mutex, new_arc_mutex, read_arc_mutex},
@@ -21,15 +20,16 @@ use tauri::{AppHandle, Emitter};
 use tauri_plugin_log::TimezoneStrategy;
 
 fn spawn_commands(handle: AppHandle, source_project: String) {
-    let ant_path = PathBuf::from(ANT_RESOURCE_PATH).join(ANT_COMMAND);
-    let seven_zip_path = PathBuf::from(SEVEN_ZIP_RESOURCE_PATH);
     let is_killed = new_arc_mutex(false);
     let is_killed_clone = Arc::clone(&is_killed);
 
     thread::spawn(move || {
+        let ant_path = PathBuf::from(ANT_RESOURCE_PATH).join(ANT_COMMAND);
+        let seven_zip_path = PathBuf::from(SEVEN_ZIP_RESOURCE_PATH);
         match resolve_resource_path(&handle, &ant_path) {
             Some(path) => {
-                let child = spawn_ant_build(&path, &source_project);
+                let source_project_path = PathBuf::from(&source_project).join(BUILD_EXTENSION);
+                let child = spawn_ant_build(&path, source_project_path.to_str().unwrap());
                 let pid = child.id();
 
                 let cancel_listener = handle.listen(EVENT_CANCEL_SENT, move |_e| {
@@ -61,8 +61,9 @@ fn spawn_commands(handle: AppHandle, source_project: String) {
 
         match resolve_resource_path(&handle, &seven_zip_path) {
             Some(path) => {
+                let build_file_path = PathBuf::from(&source_project).join("dist/SIGP_INT.jar");
                 let is_killed_clone2 = Arc::clone(&is_killed_clone);
-                let child = spawn_7zip(&path, &source_project);
+                let child = spawn_7zip(&path, build_file_path.to_str().unwrap());
                 let pid = child.id();
 
                 let cancel_listener = handle.listen(EVENT_CANCEL_SENT, move |_e| {

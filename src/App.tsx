@@ -8,14 +8,32 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { setListeners } from "./events/events";
 import { loadConfig, saveConfig } from "./utils/config";
-import { _7ZIP_EVENT_COMPLETE_SUCCESSFUL, EVENT_CANCEL_SENT, EVENT_REUSE_FILE } from "./constants/constants";
-import { chooseFolder, shouldStart, shouldStop, shouldUseRecentFile, showErrorDialog } from "./dialog/prompt";
+import {
+  _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+  EVENT_CANCEL_SENT,
+  EVENT_REUSE_FILE,
+} from "./constants/constants";
+import {
+  chooseFolder,
+  shouldStart,
+  shouldStop,
+  shouldUseRecentFile,
+  showErrorDialog,
+} from "./dialog/prompt";
 import { error } from "@tauri-apps/plugin-log";
 import { emit } from "@tauri-apps/api/event";
 import { isBuildFileRecent } from "./utils/fsUtils";
 import { validatePaths } from "./utils/pathValidator";
 import { blockDevTools } from "./utils/blockDevTools";
-import { Alert, Button, createTheme, CssBaseline, Stack, TextField, ThemeProvider } from "@mui/material";
+import {
+  Alert,
+  Button,
+  createTheme,
+  CssBaseline,
+  Stack,
+  TextField,
+  ThemeProvider,
+} from "@mui/material";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);
@@ -97,7 +115,10 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <main className="container">
-        <Stack direction="row" gap={1} margin={1} height={50} alignItems={"center"}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", gap: 1, margin: 1, height: 50 }}
+        >
           <TextField
             id="outlined-basic"
             value={sourceProject}
@@ -108,11 +129,18 @@ function App() {
             label="Origem (SIGP_INT)"
             variant="outlined"
           />
-          <Button disabled={isRunning} onClick={() => chooseFolder(setSourceProject)} variant="contained">
+          <Button
+            disabled={isRunning}
+            onClick={() => chooseFolder(setSourceProject)}
+            variant="contained"
+          >
             Escolher
           </Button>
         </Stack>
-        <Stack direction="row" gap={1} margin={1} height={50} alignItems={"center"}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", gap: 1, margin: 1, height: 50 }}
+        >
           <TextField
             value={targetProject}
             onChange={({ target }) => setTargetProject(target.value.trim())}
@@ -122,12 +150,26 @@ function App() {
             label="Destino (sigpintegrado)"
             variant="outlined"
           />
-          <Button disabled={isRunning} onClick={() => chooseFolder(setTargetProject)} variant="contained">
+          <Button
+            disabled={isRunning}
+            onClick={() => chooseFolder(setTargetProject)}
+            variant="contained"
+          >
             Escolher
           </Button>
         </Stack>
-        <Stack spacing={1} gap={1} margin={1} alignItems={"center"}>
-          <Button disabled={isRunning} onClick={start} loading={isRunning} loadingPosition="end" variant="contained">
+        <Stack
+          direction="column"
+          spacing={1}
+          sx={{ alignItems: "center", gap: 1, margin: 1, height: 50 }}
+        >
+          <Button
+            disabled={isRunning}
+            onClick={start}
+            loading={isRunning}
+            loadingPosition="end"
+            variant="contained"
+          >
             {isRunning ? "Executando..." : "Executar"}
           </Button>
           <Button disabled={!isRunning} onClick={stop} variant="contained">

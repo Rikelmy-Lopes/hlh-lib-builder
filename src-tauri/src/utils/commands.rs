@@ -1,15 +1,13 @@
 use crate::{
-    config::constants::{BUILD_EXTENSION, CREATE_NO_WINDOW_FLAG},
+    config::constants::{CREATE_NO_WINDOW_FLAG, FILE_TO_DELETE},
     utils::output::format_output,
 };
 use std::{
     os::windows::process::CommandExt,
-    path::PathBuf,
     process::{Child, Command, Stdio},
 };
 
-pub fn spawn_ant_build(ant_path: &str, source_project: &str) -> Child {
-    let source_project_path = PathBuf::from(source_project).join(BUILD_EXTENSION);
+pub fn spawn_ant_build(ant_path: &str, source_project_path: &str) -> Child {
 
     Command::new(ant_path)
         .arg("-q")
@@ -26,13 +24,12 @@ pub fn spawn_ant_build(ant_path: &str, source_project: &str) -> Child {
         .expect("Falha ao executar o Apache Ant. Verifique se o caminho está correto.")
 }
 
-pub fn spawn_7zip(seven_zip_path: &str, source_project: &str) -> Child {
-    let build_file_path = PathBuf::from(source_project).join("dist/SIGP_INT.jar");
+pub fn spawn_7zip(seven_zip_path: &str, build_file_path: &str) -> Child {
 
     Command::new(seven_zip_path)
         .arg("d")
         .arg(build_file_path)
-        .arg("META-INF/persistence.xml")
+        .arg(FILE_TO_DELETE)
         /* .arg("-version") */
         .creation_flags(CREATE_NO_WINDOW_FLAG)
         .stdout(Stdio::piped())
