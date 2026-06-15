@@ -2,8 +2,10 @@ mod config;
 mod utils;
 use crate::{
     config::constants::{
-        _7ZIP_EVENT_COMPLETE_SUCCESSFUL, _7ZIP_EVENT_COMPLETE_WITH_ERROR, ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
-        ANT_RESOURCE_PATH, BUILD_EXTENSION, EVENT_CANCEL_RECEIVED, EVENT_CANCEL_SENT, EVENT_RESOURCE_ERROR, SEVEN_ZIP_RESOURCE_PATH
+        ANT_COMMAND, ANT_EVENT_COMPLETE_SUCCESSFUL, ANT_EVENT_COMPLETE_WITH_ERROR,
+        ANT_RESOURCE_PATH, BUILD_EXTENSION, EVENT_CANCEL_RECEIVED, EVENT_CANCEL_SENT,
+        EVENT_RESOURCE_ERROR, SEVEN_ZIP_RESOURCE_PATH, _7ZIP_EVENT_COMPLETE_SUCCESSFUL,
+        _7ZIP_EVENT_COMPLETE_WITH_ERROR,
     },
     utils::{
         arc_mutex::{lock_arc_mutex, new_arc_mutex, read_arc_mutex},
@@ -15,8 +17,8 @@ use crate::{
 use log::LevelFilter;
 use std::thread;
 use std::{path::PathBuf, sync::Arc};
-use tauri::Listener;
 use tauri::{AppHandle, Emitter};
+use tauri::{Listener, Manager};
 use tauri_plugin_log::TimezoneStrategy;
 
 fn spawn_commands(handle: AppHandle, source_project: String) {
@@ -113,6 +115,12 @@ pub fn run() {
                 })
                 .build(),
         )
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main window")
+                .set_focus();
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![start])

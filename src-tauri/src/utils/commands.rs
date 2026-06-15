@@ -8,7 +8,6 @@ use std::{
 };
 
 pub fn spawn_ant_build(ant_path: &str, source_project_path: &str) -> Child {
-
     Command::new(ant_path)
         .arg("-q")
         .arg("-f")
@@ -25,7 +24,6 @@ pub fn spawn_ant_build(ant_path: &str, source_project_path: &str) -> Child {
 }
 
 pub fn spawn_7zip(seven_zip_path: &str, build_file_path: &str) -> Child {
-
     Command::new(seven_zip_path)
         .arg("d")
         .arg(build_file_path)
